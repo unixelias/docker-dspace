@@ -1,4 +1,4 @@
-[![](https://badge.imagelayers.io/1science/java:latest.svg)](https://imagelayers.io/?images=1science/java:latest 'Get your own badge on imagelayers.io')
+[![](https://badge.imagelayers.io/1science/dspace:latest.svg)](https://imagelayers.io/?images=1science/dspace:latest 'Get your own badge on imagelayers.io')
 
 # What is DSpace?
 
