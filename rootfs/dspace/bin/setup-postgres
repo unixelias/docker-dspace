@@ -16,7 +16,7 @@ POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dspace}
 psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE USER $POSTGRES_USER WITH LOGIN PASSWORD '$POSTGRES_PASSWORD';"
 psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE DATABASE dspace;"
 psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE dspace to $POSTGRES_USER;"
-echo "Database 'dspace'created"
+echo "Database 'dspace' created"
 
 # Configure database in dspace.cfg
 sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_PORT_5432_TCP_ADDR}:${POSTGRES_PORT_5432_TCP_PORT}/dspace#" ${DSPACE_CFG}
