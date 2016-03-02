@@ -38,7 +38,7 @@ docker run -ti --link dspace_db:postgres \
 then run DSpace: 
 
 ```
-docker run -ti --link dspace_db:postgres -p 8080:8080 1science/dspace
+docker run -d --link dspace_db:postgres -p 8080:8080 1science/dspace
 ```
 
 After few seconds DSpace should be accessible from:

@@ -16,7 +16,7 @@ ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 WORKDIR /tmp
 
 # Install runtime and dependencies
-RUN apt-get update && apt-get install -y ant postgresql-client \
+RUN apt-get update && apt-get install -y vim ant postgresql-client \
     && mkdir -p maven dspace "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
@@ -41,4 +41,4 @@ RUN echo "Debian GNU/Linux 8 (jessie) image. (`uname -rsv`)" >> /root/.built && 
     echo "- with DSpace $DSPACE_VERSION on Tomcat $TOMCAT_VERSION"  >> /root/.built
 
 EXPOSE 8080
-CMD ["catalina.sh", "run"]
+CMD ["start-dspace"]

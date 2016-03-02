@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Configure database in dspace.cfg
+if [ -n $POSTGRES_PORT_5432_TCP_ADDR -a -n $POSTGRES_PORT_5432_TCP_PORT ]; then
+    sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_PORT_5432_TCP_ADDR}:${POSTGRES_PORT_5432_TCP_PORT}/dspace#" ${DSPACE_CFG}
+    sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}
+    sed -i "s#db.password = dspace#db.password = ${POSTGRES_PASSWORD}#" ${DSPACE_CFG}
+    echo "Database 'dspace' configured"
+fi
+
+# Start Tomcat
+catalina.sh run
