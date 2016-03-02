@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+DSPACE_CFG=/dspace/config/dspace.cfg
+
+if [ -z $POSTGRES_PORT_5432_TCP_ADDR -a -z $POSTGRES_PORT_5432_TCP_PORT ]; then
+  echo "Please create a postgres container and link it to this one:"
+  echo "> docker run -d --name dspace_db postgres"
+  echo "> docker run --link dspace_db:postgres -p 8080:8080 1science/dspace setup-postgres"
+  exit 1
+fi
+
+POSTGRES_USER=${POSTGRES_USER:-dspace}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dspace}
+
+# Create database
+psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE USER $POSTGRES_USER WITH LOGIN PASSWORD '$POSTGRES_PASSWORD';"
+psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE DATABASE dspace;"
+psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE dspace to $POSTGRES_USER;"
+echo "Database 'dspace'created"
+
+# Configure database in dspace.cfg
+sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_PORT_5432_TCP_ADDR}:${POSTGRES_PORT_5432_TCP_PORT}/dspace#" ${DSPACE_CFG}
+sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}
+sed -i "s#db.password = dspace#db.password = ${POSTGRES_PASSWORD}#" ${DSPACE_CFG}
+echo "Database 'dspace' configured"
+
+# Create DSpace administrator
+dspace create-administrator -e ${ADMIN_EMAIL:-devops@1science.com} -f ${ADMIN_FIRSTNAME:-DSpace} -l ${ADMIN_LASTNAME:-Admin} -p ${ADMIN_PASSWD:-} -c ${ADMIN_LANGUAGE:-en}
+echo "DSpace administrator created"
