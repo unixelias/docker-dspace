@@ -13,11 +13,14 @@ POSTGRES_USER=${POSTGRES_USER:-dspace}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dspace}
 POSTGRES_SCHEMA=${POSTGRES_SCHEMA:-dspace}
 
-# Create database
-psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE USER $POSTGRES_USER WITH LOGIN PASSWORD '$POSTGRES_PASSWORD';"
-psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE DATABASE $POSTGRES_SCHEMA;"
-psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_SCHEMA to $POSTGRES_USER;"
-echo "Database 'dspace' created"
+# Create database if not exists
+SCHEMA_EXISTS=$(psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "SELECT * FROM pg_database WHERE datname = '$POSTGRES_SCHEMA';" | grep "(1 rows)" | echo $?)
+if [ $SCHEMA_EXISTS -eq 1 ]; then
+  psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE USER $POSTGRES_USER WITH LOGIN PASSWORD '$POSTGRES_PASSWORD';"
+  psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "CREATE DATABASE $POSTGRES_SCHEMA;"
+  psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE $POSTGRES_SCHEMA to $POSTGRES_USER;"
+  echo "Database 'dspace' created"
+fi
 
 # Configure database in dspace.cfg
 sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_PORT_5432_TCP_ADDR}:${POSTGRES_PORT_5432_TCP_PORT}/dspace#" ${DSPACE_CFG}
@@ -27,4 +30,3 @@ echo "Database 'dspace' configured"
 
 # Create DSpace administrator
 dspace create-administrator -e ${ADMIN_EMAIL:-devops@1science.com} -f ${ADMIN_FIRSTNAME:-DSpace} -l ${ADMIN_LASTNAME:-Admin} -p ${ADMIN_PASSWD:-admin123} -c ${ADMIN_LANGUAGE:-en}
-echo "DSpace administrator created"

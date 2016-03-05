@@ -11,45 +11,39 @@ This image is based on official [Java image](https://hub.docker.com/_/java/) and
 # Usage
 
 DSpace use [PostgreSQL](http://www.postgresql.org/) as database.
- 
+
 So first of all we have to create a PostgreSQL container:
 
 ```
 docker run -d --name dspace_db -p 5432:5432 postgres
 ```
 
-then create the DSpace schema: 
-
-```
-docker run -ti --link dspace_db:postgres -p 8080:8080 1science/dspace setup-postgres
-```
-
-By default the schema is created with the name `dspace` for a user `dspace` and password `space`, but it' possible to override this default settings : 
-
- 
-```
-docker run -ti --link dspace_db:postgres \
-        -e POSTGRES_SCHEMA=my_dspace \
-        -e POSTGRES_USER=my_user \
-        -e POSTGRES_PASSWORD=mypassword\
-        -p 8080:8080 1science/dspace setup-postgres
-```
-
-then run DSpace: 
+then run DSpace:
 
 ```
 docker run -d --link dspace_db:postgres -p 8080:8080 1science/dspace
 ```
 
+By default the database schema is created with the name `dspace` for a user `dspace` and password `space`, but it' possible to override this default settings :
+
+
+```
+docker run -d --link dspace_db:postgres \
+        -e POSTGRES_SCHEMA=my_dspace \
+        -e POSTGRES_USER=my_user \
+        -e POSTGRES_PASSWORD=my_password \
+        -p 8080:8080 1science/dspace
+```
+
 After few seconds DSpace should be accessible from:
- dck
+
  - JSP User Interface: http://localhost:8080/jspui
  - XML User Interface: http://localhost:8080/xmlui
  - OAI-PMH Interface: http://localhost:8080/oai/request?verb=Identify
 
 # Build
 
-This project is configured as an [automated build in Dockerhub](https://hub.docker.com/r/1science/java/). 
+This project is configured as an [automated build in Dockerhub](https://hub.docker.com/r/1science/java/).
 
 Each branch give the related image tag.  
 
