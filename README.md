@@ -2,7 +2,7 @@
 
 # What is DSpace?
 
-![logo](logo.png)
+![logo](https://wiki.duraspace.org/download/attachments/31655033/DSpace_logo_1in.png)
 
 [DSpace](https://wiki.duraspace.org/display/DSDOC5x/Introduction) is an open source repository software package typically used for creating open access repositories for scholarly and/or published digital content. While DSpace shares some feature overlap with content management systems and document management systems, the DSpace repository software serves a specific need as a digital archives system, focused on the long-term storage, access and preservation of digital content.
 
@@ -24,7 +24,7 @@ then run DSpace:
 docker run -d --link dspace_db:postgres -p 8080:8080 1science/dspace
 ```
 
-By default the database schema is created with the name `dspace` for a user `dspace` and password `space`, but it' possible to override this default settings :
+By default the database schema is created with the name `dspace` for a user `dspace` and password `dspace`, but it' possible to override this default settings :
 
 
 ```
