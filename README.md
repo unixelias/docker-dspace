@@ -10,21 +10,25 @@ This image is based on official [Java image](https://hub.docker.com/_/java/) and
 
 # Usage
 
-DSpace use [PostgreSQL](http://www.postgresql.org/) as database.
+DSpace use [PostgreSQL](http://www.postgresql.org/) as database. 
 
-So first of all we have to create a PostgreSQL container:
+We might use an external database or create a PostgreSQL container linked to the DSpace container.
+
+## Postgres as a container
+
+First, we have to create the PostgreSQL container:
 
 ```
 docker run -d --name dspace_db -p 5432:5432 postgres
 ```
 
-then run DSpace:
+then run DSpace linking the PostgreSQL container:
 
 ```
 docker run -d --link dspace_db:postgres -p 8080:8080 1science/dspace
 ```
 
-By default the database schema is created with the name `dspace` for a user `dspace` and password `dspace`, but it' possible to override this default settings :
+By default the database schema is created with the name `dspace` for a user `dspace` and password `dspace`, but it's possible to override this default settings :
 
 
 ```
@@ -34,6 +38,32 @@ docker run -d --link dspace_db:postgres \
         -e POSTGRES_PASSWORD=my_password \
         -p 8080:8080 1science/dspace
 ```
+
+We might also used the Docker compose project in the `sample` directory.
+
+## External database  
+
+When you use an external Postgres, you have to set some environment variables :
+  - `POSTGRES_DB_HOST` (required): The server host name or ip.
+  - `POSTGRES_DB_PORT` (optional): The server port (`5432` by default)
+  - `POSTGRES_SCHEMA` (optional): The database schema (`dspace` by default)
+  - `POSTGRES_USER` (optional): The user used by DSpace (`dspace` by default)
+  - `POSTGRES_PASSWORD` (optional): The password of the user used by DSpace (`dspace` by default)
+  - `POSTGRES_ADMIN_USER` (optional): The admin user creating the Database and the user (`postgres` by default)
+  - `POSTGRES_ADMIN_PASSWORD` (optional): The password of the admin user
+  
+  
+```
+docker run -d  \
+        -e POSTGRES_DB_HOST=my_host \
+        -e POSTGRES_ADMIN_USER=my_admin \
+        -e POSTGRES_ADMIN_PASSWORD=my_admin_password \
+        -e POSTGRES_SCHEMA=my_dspace \
+        -e POSTGRES_USER=my_user \
+        -e POSTGRES_PASSWORD=my_password \
+        -p 8080:8080 1science/dspace
+```
+
 
 After few seconds DSpace should be accessible from:
 
