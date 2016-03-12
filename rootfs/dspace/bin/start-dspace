@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
+POSTGRES_DB_HOST=${POSTGRES_DB_HOST:-$POSTGRES_PORT_5432_TCP_ADDR}
+POSTGRES_DB_PORT=${POSTGRES_DB_PORT:-$POSTGRES_PORT_5432_TCP_PORT}
+
 # Create an configure database
-if [ -n $POSTGRES_PORT_5432_TCP_ADDR -a -n $POSTGRES_PORT_5432_TCP_PORT ]; then
+if [ -n $POSTGRES_DB_HOST -a -n $POSTGRES_DB_PORT ]; then
     # Setup postgres
     setup-postgres
 fi
