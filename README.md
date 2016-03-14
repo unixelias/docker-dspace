@@ -74,6 +74,18 @@ After few seconds DSpace should be accessible from:
 
 Note: The security constraint to tunnel request with SSL on the `/rest` endpoint has been removed, but it's very important to securize this endpoint in production through [Nginx](https://github.com/1science/docker-nginx) for example.
 
+## Configure webapps installed
+
+DSpace consumed a lot of memory, and sometimes we don't really need all the DSpace webapps. So iy's possible to set an environment variables to control the webapps installed :
+
+```
+docker run -d --link dspace_db:postgres \
+        -e DSPACE_WEBAPPS="jspui xmlui rest" \
+        -p 8080:8080 1science/dspace
+```
+
+The command above only installed the webapps `jspui` `xmlui` and `rest`.
+
 
 # Build
 
