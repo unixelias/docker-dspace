@@ -10,4 +10,4 @@ if [ -n $POSTGRES_DB_HOST -a -n $POSTGRES_DB_PORT ]; then
 fi
 
 # Start Tomcat
-catalina.sh run
+exec catalina.sh run
