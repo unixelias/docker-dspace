@@ -2,11 +2,25 @@
 
 POSTGRES_DB_HOST=${POSTGRES_DB_HOST:-$POSTGRES_PORT_5432_TCP_ADDR}
 POSTGRES_DB_PORT=${POSTGRES_DB_PORT:-$POSTGRES_PORT_5432_TCP_PORT}
+POSTGRES_DB_PORT=${POSTGRES_DB_PORT:-5432}
 
 # Create an configure database
 if [ -n $POSTGRES_DB_HOST -a -n $POSTGRES_DB_PORT ]; then
     # Setup postgres
     setup-postgres
+fi
+
+# Remove unused webapps
+# see https://wiki.duraspace.org/display/DSDOC5x/Performance+Tuning+DSpace
+if [ -n "$DSPACE_WEBAPPS" ]; then
+    webapps=($(ls /usr/local/tomcat/webapps | tr -d '/'))
+    webapps_to_keep=($(echo "$DSPACE_WEBAPPS solr"))
+    for element in ${webapps_to_keep[@]}; do
+      webapps=(${webapps[@]/$element})
+    done
+    for webapp in ${webapps[@]}; do
+      rm -rf /usr/local/tomcat/webapps/$webapp
+    done
 fi
 
 # Start Tomcat
