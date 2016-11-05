@@ -2,7 +2,7 @@
 # DSpace image
 #
 
-FROM java:openjdk-7u95
+FROM openjdk:7-jdk
 MAINTAINER 1science Devops Team <devops@1science.org>
 
 # Environment variables
