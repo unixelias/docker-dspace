@@ -37,6 +37,20 @@ if [ $USER_EXISTS -eq 1 ]; then
   echo "User '${POSTGRES_USER}' created"
 fi
 
+#Configure pgcrypto
+# Create a new schema in this database named "extensions" (or whatever you want to name it)
+psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE SCHEMA extensions;" 2>&1 > /dev/null
+# Enable this extension in this new schema
+psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" 2>&1 > /dev/null
+# Determine what your database "search_path" is set to
+# (the search_path is where your database will look for extensions)
+psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "SHOW search_path;" 2>&1 > /dev/null
+# Update your database's "search_path" to also search the new "extensions" schema.
+# You are just appending it on the end of the existing comma-separated list.
+psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "ALTER DATABASE dspace SET search_path TO [existing-search_path-list],extensions; " 2>&1 > /dev/null
+# Grant rights to call functions in the extensions schema to your dspace user
+psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "GRANT USAGE ON SCHEMA extensions TO dspace;" 2>&1 > /dev/null
+
 # Configure database in dspace.cfg
 sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_SCHEMA}#" ${DSPACE_CFG}
 sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}

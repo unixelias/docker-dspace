@@ -4,7 +4,7 @@ shopt -s extglob
 for i in $( ls docker); do
   case "$i" in
        *-test )  ;;
-       * ) docker build -t unixelias/dspace-ufvjm:$i docker/$i ;;
+       * ) docker build -t unixelias/docker-dspace:$i docker/$i ;;
   esac
 done
 
