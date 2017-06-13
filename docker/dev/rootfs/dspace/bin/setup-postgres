@@ -37,6 +37,20 @@ if [ $USER_EXISTS -eq 1 ]; then
   echo "User '${POSTGRES_USER}' created"
 fi
 
+#Configure pgcrypto
+# Create a new schema in this database named "extensions" (or whatever you want to name it)
+CREATE SCHEMA extensions;
+# Enable this extension in this new schema
+CREATE EXTENSION pgcrypto SCHEMA extensions;
+# Determine what your database "search_path" is set to
+# (the search_path is where your database will look for extensions)
+SHOW search_path;
+# Update your database's "search_path" to also search the new "extensions" schema.
+# You are just appending it on the end of the existing comma-separated list.
+ALTER DATABASE dspace SET search_path TO [existing-search_path-list],extensions;
+# Grant rights to call functions in the extensions schema to your dspace user
+GRANT USAGE ON SCHEMA extensions TO dspace;
+
 # Configure database in dspace.cfg
 sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_SCHEMA}#" ${DSPACE_CFG}
 sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}

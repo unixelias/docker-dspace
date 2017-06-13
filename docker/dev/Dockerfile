@@ -21,9 +21,7 @@ WORKDIR /tmp
 # Install runtime and dependencies
 RUN apt-get update && apt-get -y upgrade \
     && apt-get install -y ant postgresql-client tomcat8 maven git \
-    && mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xvf dspace.tar.gz --strip-components=1  -C dspace \
+    && git clone https://github.com/DSpace/DSpace.git -b dspace-6_x dspace \
     && cd dspace && mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
