@@ -2,7 +2,7 @@
 # DSpace image
 #
 
-FROM openjdk:8-jdk
+FROM openjdk:7-jdk
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
