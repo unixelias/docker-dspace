@@ -1,6 +1,6 @@
 # This Dockerfile is needed just to control the startup order
 # see: https://docs.docker.com/compose/startup-order/
-FROM 1science/dspace:5.4
+FROM unixelias/docker-dspace:latest
 
 ADD wait-for-postgres.sh /usr/local/bin
 

@@ -5,9 +5,9 @@ postgres:
     - 5432:5432
 
 # DSpace
-app:
+dspace:
   build: ./app
   ports:
-    - 8080:8080
+    - 8087:8080
   links:
     - postgres
