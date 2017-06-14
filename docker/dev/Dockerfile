@@ -13,7 +13,7 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 # Environment variables
 ENV DSPACE_VERSION=6.0
 ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-${DSPACE_VERSION}/dspace-${DSPACE_VERSION}-release.tar.gz
-ENV CATALINA_HOME=/usr/share/tomcat8 DSPACE_HOME=/dspace
+ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
 WORKDIR /tmp
@@ -26,7 +26,7 @@ RUN apt-get update && apt-get -y upgrade \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
-    && sed -i s/CONFIDENTIAL/NONE/ /usr/share/tomcat8/webapps/rest/WEB-INF/web.xml \
+    && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr /tmp/* && apt-get remove -y ant maven \
     && apt-get clean
 
