@@ -2,7 +2,7 @@
 # DSpace image
 #
 
-FROM openjdk:8-jdk
+FROM openjdk:7-jdk
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
@@ -13,7 +13,7 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 # Environment variables
 ENV DSPACE_VERSION=6.0 TOMCAT_MAJOR=8 TOMCAT_VERSION=8.5.15
 ENV TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
-    MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz \
+    MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz \
     DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-${DSPACE_VERSION}/dspace-${DSPACE_VERSION}-release.tar.gz
 ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
