@@ -48,30 +48,33 @@ RUN apt-get update \
 # Getting Dspace
 RUN mkdir -p dspace \
     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xvf dspace.tar.gz --strip-components=1  -C dspace
+    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+    && rm -rf dspace.tar.gz
 
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
-    && tar -xvf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME"
+    && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
+    && rm -rf tomcat.tar.gz
 
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
-    && tar -xvf maven.tar.gz --strip-components=1  -C maven
+    && tar -xf maven.tar.gz --strip-components=1  -C maven \
+    && rm -rf maven.tar.gz
 
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
-    && ant fresh_install
-
-RUN && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
+    && ant init_installation init_configs install_code copy_webapps \
+    && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
     && rm -rf /usr/local/tomcat/webapps/oai \
     && rm -rf /usr/local/tomcat/webapps/sword \
     && rm -rf /usr/local/tomcat/webapps/swordv2 \
-    && rm -rf /usr/local/tomcat/webapps/xmlui
+    && rm -rf /usr/local/tomcat/webapps/xmlui \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install root filesystem
-ADD ./rootfs
+ADD ./rootfs /
 
 COPY log4j.properties /usr/local/tomcat/lib
 
