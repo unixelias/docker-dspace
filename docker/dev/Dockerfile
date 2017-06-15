@@ -12,8 +12,8 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 
 # Environment variables
 ENV DSPACE_VERSION=6.0 \
-    TOMCAT_MAJOR=7 \
-    TOMCAT_VERSION=7.0.78 \
+    TOMCAT_MAJOR=9 \
+    TOMCAT_VERSION=9.0.0.M21 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.0
 
