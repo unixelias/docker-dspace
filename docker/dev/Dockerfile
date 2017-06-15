@@ -12,10 +12,10 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 
 # Environment variables
 ENV DSPACE_VERSION=5.6 \
-    TOMCAT_MAJOR=7 \
-    TOMCAT_VERSION=7.0.78
+    TOMCAT_MAJOR=9 \
+    TOMCAT_VERSION=9.0.0.M21 \
     MAVEN_MAJOR=3 \
-    MAVEN_VERSION=3.5.0 \
+    MAVEN_VERSION=3.5.0
 
 ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-$DSPACE_VERSION/dspace-$DSPACE_VERSION-release.tar.gz \
     MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
@@ -42,23 +42,28 @@ RUN apt-get install -y \
     vim
 
 # Install runtime and dependencies
+
 # Getting Dspace
 RUN mkdir -p dspace \
     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
     && tar -xvf dspace.tar.gz --strip-components=1  -C dspace
 
+# Getting Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
     && tar -xvf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME"
 
+# Getting Maven
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
     && tar -xvf maven.tar.gz --strip-components=1  -C maven
 
-RUN cd dspace && ../maven/bin/mvn package \
+# Install
+RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant fresh_install
 
+#Copy and Clean
 RUN && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
@@ -78,7 +83,7 @@ WORKDIR /dspace
 VOLUME /dspace/upload
 
 # Build info
-RUN echo "Debian GNU/Linux 8 (jessie) image. (`uname -rsv`)" >> /root/.built && \
+RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
     echo "- with `java -version 2>&1 | awk 'NR == 2'`" >> /root/.built && \
     echo "- with DSpace $DSPACE_VERSION on Tomcat $TOMCAT_VERSION"  >> /root/.built
 
