@@ -10,4 +10,4 @@ shopt -s extglob
 
 
 #Exclusivo para DEV version
-docker build -t unixelias/docker-dspace:6.0-tc9 docker/dev && docker push unixelias/docker-dspace:6.0-tc9
+docker build -t unixelias/docker-dspace:5.6-tc9 docker/dev && docker push unixelias/docker-dspace:5.6-tc9

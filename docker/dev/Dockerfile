@@ -11,7 +11,7 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
       Dockerfile_location="/root/buildinfo"
 
 # Environment variables
-ENV DSPACE_VERSION=6.0 \
+ENV DSPACE_VERSION=5.6 \
     TOMCAT_MAJOR=9 \
     TOMCAT_VERSION=9.0.0.M21 \
     MAVEN_MAJOR=3 \
@@ -27,6 +27,7 @@ ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
 WORKDIR /tmp
 
+# Install pre dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
@@ -34,6 +35,7 @@ RUN apt-get update \
     xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update \
     && apt-get install -y \
     ant \
@@ -45,22 +47,25 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
-# Getting Dspace
+# Getting and unpacking Dspace
 RUN mkdir -p dspace \
     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
     && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
     && rm -rf dspace.tar.gz
 
+# Getting and unpacking Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
     && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
     && rm -rf tomcat.tar.gz
 
+# Getting and unpacking Maven
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
+# Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
@@ -76,6 +81,7 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 # Install root filesystem
 ADD ./rootfs /
 
+# Install root Log4j configuration
 COPY log4j.properties /usr/local/tomcat/lib
 
 WORKDIR /dspace
