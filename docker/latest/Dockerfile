@@ -11,7 +11,7 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
       Dockerfile_location="/root/buildinfo"
 
 # Environment variables
-ENV DSPACE_VERSION=6.0 TOMCAT_MAJOR=8 TOMCAT_VERSION=8.5.15
+ENV DSPACE_VERSION=5.6 TOMCAT_MAJOR=8 TOMCAT_VERSION=8.5.15
 ENV TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz \
     MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz \
     DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-${DSPACE_VERSION}/dspace-${DSPACE_VERSION}-release.tar.gz
@@ -43,7 +43,7 @@ ADD ./rootfs /
 WORKDIR /dspace
 
 # Build info
-RUN echo "Debian GNU/Linux 8 (jessie) image. (`uname -rsv`)" >> /root/.built && \
+RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
     echo "- with `java -version 2>&1 | awk 'NR == 2'`" >> /root/.built && \
     echo "- with DSpace $DSPACE_VERSION on Tomcat $TOMCAT_VERSION"  >> /root/.built
 
