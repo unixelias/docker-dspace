@@ -1,0 +1,26 @@
+version: "2"
+services:
+  postgres:
+    hostname: 'postgres'
+    restart: always
+    image: postgres:latest
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  dspace:
+    build: ./app
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_DB_HOST=postgres
+      - POSTGRES_ADMIN_USER=postgres
+      - POSTGRES_ADMIN_PASSWORD=admin
+      - POSTGRES_SCHEMA=dspace
+      - POSTGRES_USER=dspace
+      - POSTGRES_PASSWORD=password
+      - DSPACE_WEBAPPS={"rest jspui rdf"}
+
+volumes:
+  db_data:
