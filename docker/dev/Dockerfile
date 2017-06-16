@@ -6,14 +6,14 @@ FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
-      Version="0.0.2" \
+      Version="5.6-alpha" \
       Architecture="x86_64" \
       Dockerfile_location="/root/buildinfo"
 
 # Environment variables
-ENV DSPACE_VERSION=5.6 \
-    TOMCAT_MAJOR=9 \
-    TOMCAT_VERSION=9.0.0.M21 \
+ENV DSPACE_VERSION=6.0 \
+    TOMCAT_MAJOR=7 \
+    TOMCAT_VERSION=7.0.78 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.0
 
@@ -42,9 +42,13 @@ RUN apt-get update \
     curl \
     default-jdk \
     default-jre \
+    locales \
     postgresql-client \
     vim \
+    && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
 # Install runtime and dependencies
 # Getting and unpacking Dspace
@@ -65,6 +69,12 @@ RUN mkdir -p maven \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
+#Some configs for 6.0
+COPY setenv.sh "$CATALINA_HOME"/bin
+COPY server.xml "$CATALINA_HOME"/conf
+COPY local.cfg dspace/config
+
+
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
@@ -81,12 +91,9 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 # Install root filesystem
 ADD ./rootfs /
 
-# Install root Log4j configuration
-COPY log4j.properties /usr/local/tomcat/lib
-
 WORKDIR /dspace
 
-VOLUME /dspace/upload
+VOLUME /dspace/assetstore
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
