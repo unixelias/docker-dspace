@@ -12,8 +12,13 @@ export JAVA_OPTS="-Xmx512M -Xms64M -Dfile.encoding=UTF-8"
 
 # Create an configure database
 if [ -n "$POSTGRES_DB_HOST" -a -n "$POSTGRES_DB_PORT" ]; then
+    until psql -h "$POSTGRES_DB_HOST" -U "postgres" -c '\l'; do
+      >&2 echo "Postgres is unavailable - sleeping"
+      sleep 1
+    done
     # Setup postgres
-    setup-postgres
+    >&2 echo "Postgres is up - executing command"
+    exec setup-postgres
 fi
 
 # Remove unused webapps
@@ -28,6 +33,8 @@ if [ -n "$DSPACE_WEBAPPS" ]; then
       rm -rf /usr/local/tomcat/webapps/$webapp
     done
 fi
+# Wait for postgres
+
 
 # Start Tomcat
 exec catalina.sh run
