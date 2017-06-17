@@ -6,7 +6,7 @@ FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
-      Version="5.6-alpha" \
+      Version="6.0-alpha" \
       Architecture="x86_64" \
       Dockerfile_location="/root/buildinfo"
 
@@ -24,6 +24,10 @@ ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-$DS
 ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
+
+RUN useradd -ms /bin/bash dspace \
+    && usermod -a -G root dspace \
+    && mkdir -p /dspace/config
 
 WORKDIR /tmp
 
@@ -50,18 +54,19 @@ RUN apt-get update \
 
 ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
-# Install runtime and dependencies
-# Getting and unpacking Dspace
-RUN mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-    && rm -rf dspace.tar.gz
 
 # Getting and unpacking Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
     && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
     && rm -rf tomcat.tar.gz
+
+# Install runtime and dependencies
+# Getting and unpacking Dspace
+RUN mkdir -p dspace \
+    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
+    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+    && rm -rf dspace.tar.gz
 
 # Getting and unpacking Maven
 RUN mkdir -p maven \
@@ -72,8 +77,9 @@ RUN mkdir -p maven \
 #Some configs for 6.0
 COPY setenv.sh "$CATALINA_HOME"/bin
 COPY server.xml "$CATALINA_HOME"/conf
-COPY local.cfg dspace/config
-
+RUN mv -f dspace/dspace/config/local.cfg.EXAMPLE dspace/dspace/config/local.cfg \
+    && ls -la dspace/dspace/config
+#COPY ./rootfs/dspace/config/local.cfg dspace/config
 
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
