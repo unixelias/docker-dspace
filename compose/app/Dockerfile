@@ -1,6 +1,6 @@
 # This Dockerfile is needed just to control the startup order
 # see: https://docs.docker.com/compose/startup-order/
-FROM unixelias/docker-dspace:5.6-alpha
+FROM unixelias/docker-dspace:6.0-alpha
 
 #COPY setup-postgres /dspace/bin
 COPY start-dspace /dspace/bin

@@ -2,7 +2,7 @@
 # DSpace image
 #
 
-FROM ubuntu:14.04
+FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
@@ -12,8 +12,8 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 
 # Environment variables
 ENV DSPACE_VERSION=6.0 \
-    TOMCAT_MAJOR=7 \
-    TOMCAT_VERSION=7.0.78 \
+    TOMCAT_MAJOR=9 \
+    TOMCAT_VERSION=9.0.0.M21 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.0
 
@@ -78,6 +78,7 @@ COPY local.cfg dspace/config
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
+    && ant fresh_install \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \

@@ -5,10 +5,13 @@ services:
 before_script:
 - ./linter.sh
 - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+- docker run -d --name postgres -p 5432:5432 postgres;
+- ./docker/dev/rootfs/dspace/bin/setup-postgres
 script:
 - ./build.sh
 after_success:
 - ./repo_build.sh
+- docker stop postgres && docker rm postgres;
 
 env:
   global:
