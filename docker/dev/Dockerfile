@@ -2,7 +2,7 @@
 # DSpace image
 #
 
-FROM ubuntu
+FROM ubuntu:14.04
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
@@ -40,7 +40,7 @@ RUN apt-get update \
     && apt-get install -y \
     ant \
     curl \
-    default-jdk \
+    default-jdk default-jre \
     default-jre \
     locales \
     postgresql-client \
