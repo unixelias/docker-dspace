@@ -26,8 +26,7 @@ ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
 RUN useradd -ms /bin/bash dspace \
-    && usermod -a -G root dspace \
-    && mkdir -p /dspace/config
+    && usermod -a -G root dspace
 
 WORKDIR /tmp
 
@@ -35,6 +34,7 @@ WORKDIR /tmp
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
+    git \
     unzip \
     xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -54,19 +54,12 @@ RUN apt-get update \
 
 ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
-
+# Install runtime and dependencies
 # Getting and unpacking Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
     && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
     && rm -rf tomcat.tar.gz
-
-# Install runtime and dependencies
-# Getting and unpacking Dspace
-RUN mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-    && rm -rf dspace.tar.gz
 
 # Getting and unpacking Maven
 RUN mkdir -p maven \
@@ -77,15 +70,21 @@ RUN mkdir -p maven \
 #Some configs for 6.0
 COPY setenv.sh "$CATALINA_HOME"/bin
 COPY server.xml "$CATALINA_HOME"/conf
-RUN mv -f dspace/dspace/config/local.cfg.EXAMPLE dspace/dspace/config/local.cfg \
-    && ls -la dspace/dspace/config
-#COPY ./rootfs/dspace/config/local.cfg dspace/config
 
-# Build, install and clean
-RUN cd dspace && ../maven/bin/mvn -q package \
-    && cd dspace/target/dspace-installer \
+# Get and build Dspace from source
+RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
+    && cd dspace && ../maven/bin/mvn -q package
+
+COPY ./rootfs/dspace/config/local.cfg dspace/dspace/target/dspace-installer
+
+# Install root filesystem
+ADD ./rootfs /
+
+RUN /dspace/bin/setup-postgres
+
+#  Install and clean
+RUN cd dspace/dspace/target/dspace-installer \
     && ant fresh_install \
-    && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
@@ -94,9 +93,6 @@ RUN cd dspace && ../maven/bin/mvn -q package \
     && rm -rf /usr/local/tomcat/webapps/swordv2 \
     && rm -rf /usr/local/tomcat/webapps/xmlui \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install root filesystem
-ADD ./rootfs /
 
 WORKDIR /dspace
 

@@ -1,0 +1,23 @@
+
+#Database configuration
+postgresql: &postgresql
+  adapter: postgresql
+  username: dspace
+  password: dspace
+  database: strano_<%= Rails.env %>
+  min_messages: ERROR
+
+defaults: &defaults
+  pool: 5
+  timeout: 5000
+  host: localhost
+  <<: *<%= ENV['DB'] || "postgresql" %>
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
