@@ -72,15 +72,17 @@ COPY setenv.sh "$CATALINA_HOME"/bin
 COPY server.xml "$CATALINA_HOME"/conf
 
 # Get and build Dspace from source
-RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
+# Getting and unpacking Dspace
+RUN mkdir -p dspace \
+    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
+    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+    && rm -rf dspace.tar.gz \
     && cd dspace && ../maven/bin/mvn -q package
 
 COPY ./rootfs/dspace/config/local.cfg dspace/dspace/target/dspace-installer
 
 # Install root filesystem
 ADD ./rootfs /
-
-RUN /dspace/bin/setup-postgres
 
 #  Install and clean
 RUN cd dspace/dspace/target/dspace-installer \

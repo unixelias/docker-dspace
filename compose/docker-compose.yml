@@ -1,6 +1,6 @@
 version: "2"
 services:
-  postgres:
+  localhost:
     hostname: 'postgres'
     restart: always
     image: postgres:latest
@@ -12,9 +12,9 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - postgres
+      - localhost
     environment:
-      - POSTGRES_DB_HOST=postgres
+      - POSTGRES_DB_HOST=localhost  
       - POSTGRES_ADMIN_USER=postgres
       - POSTGRES_ADMIN_PASSWORD=admin
       - POSTGRES_SCHEMA=dspace
