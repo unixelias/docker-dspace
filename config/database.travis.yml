@@ -1,23 +1,25 @@
 
 #Database configuration
-postgresql: &postgresql
-  adapter: postgresql
-  username: dspace
-  password: dspace
-  database: strano_<%= Rails.env %>
-  min_messages: ERROR
-
-defaults: &defaults
-  pool: 5
-  timeout: 5000
-  host: localhost
-  <<: *<%= ENV['DB'] || "postgresql" %>
-
 development:
-  <<: *defaults
+  adapter: postgresql
+  encoding: unicode
+  database: dspace
+  username: dspace
+  host: localhost
+  password: dspace # if you need a password
 
 test:
-  <<: *defaults
+  adapter: postgresql
+  encoding: unicode
+  database: dspace
+  username: dspace
+  host: localhost
+  password: dspace # if you need a password
 
 production:
-  <<: *defaults
+  adapter: postgresql
+  encoding: unicode
+  database: dspace
+  username: dspace
+  host: localhost
+  password: dspace # probably you will need a password
