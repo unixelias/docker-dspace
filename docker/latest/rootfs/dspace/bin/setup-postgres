@@ -29,6 +29,13 @@ if [ $SCHEMA_EXISTS -eq 1 ]; then
   echo "Database '${POSTGRES_SCHEMA}' created"
 fi
 
+# Install extension pgcrypto
+EXTENSION_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -U "$POSTGRES_ADMIN_USER" -lqt | cut -d \| -f 1 | grep "pgcrypto";echo $?)
+if [ $EXTENSION_EXISTS -eq 1 ]; then
+  psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto;" 2>&1 > /dev/null
+  echo "Extension pgcrypto installed"
+fi
+
 # Create user
 USER_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "SELECT 1 FROM pg_roles WHERE rolname='${POSTGRES_USER}';" | grep "1" 2>&1 > /dev/null; echo $?)
 if [ $USER_EXISTS -eq 1 ]; then

@@ -27,44 +27,49 @@ ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
 WORKDIR /tmp
 
+# Install pre dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     unzip \
-    xz-utils
+    xz-utils \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install -y \
+# Install build dependencies and Java OpenJDK ubuntu latest
+RUN apt-get update \
+    && apt-get install -y \
     ant \
     curl \
     default-jdk \
     default-jre \
     postgresql-client \
-    vim
+    vim \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
-
-# Getting Dspace
+# Getting and unpacking Dspace
 RUN mkdir -p dspace \
     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xvf dspace.tar.gz --strip-components=1  -C dspace
+    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+    && rm -rf dspace.tar.gz
 
-# Getting Tomcat
+# Getting and unpacking Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
-    && tar -xvf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME"
+    && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
+    && rm -rf tomcat.tar.gz
 
-# Getting Maven
+# Getting and unpacking Maven
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
-    && tar -xvf maven.tar.gz --strip-components=1  -C maven
+    && tar -xf maven.tar.gz --strip-components=1  -C maven \
+    && rm -rf maven.tar.gz
 
-# Install
+# Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
-    && ant fresh_install
-
-#Copy and Clean
-RUN && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
+    && ant fresh_install \
+    && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
     && rm -rf /usr/local/tomcat/webapps/oai \
@@ -78,9 +83,12 @@ ADD ./rootfs
 
 COPY log4j.properties /usr/local/tomcat/lib
 
+# Install root Log4j configuration
+COPY log4j.properties /usr/local/tomcat/lib
+
 WORKDIR /dspace
 
-VOLUME /dspace/upload
+VOLUME /dspace/assetstore
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \

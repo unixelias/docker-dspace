@@ -5,7 +5,7 @@ POSTGRES_DB_PORT=${POSTGRES_DB_PORT:-$POSTGRES_PORT_5432_TCP_PORT}
 POSTGRES_DB_PORT=${POSTGRES_DB_PORT:-5432}
 
 # Create an configure database
-if [ -n $POSTGRES_DB_HOST -a -n $POSTGRES_DB_PORT ]; then
+if [ -n "$POSTGRES_DB_HOST" -a -n "$POSTGRES_DB_PORT" ]; then
     # Setup postgres
     setup-postgres
 fi
