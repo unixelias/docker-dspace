@@ -68,7 +68,7 @@ RUN mkdir -p maven \
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
-    && ant fresh_install \
+    && ant ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
