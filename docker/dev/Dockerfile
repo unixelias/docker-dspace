@@ -35,6 +35,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     git \
+    sudo \
     unzip \
     xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -47,7 +48,11 @@ RUN apt-get update \
     default-jdk default-jre \
     default-jre \
     locales \
+    postgresql \
     postgresql-client \
+    postgresql-contrib \
+    python-software-properties \
+    software-properties-common \
     vim \
     && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -80,12 +85,32 @@ RUN mkdir -p dspace \
     && cd dspace && ../maven/bin/mvn -q package
 
 COPY ./rootfs/dspace/config/local.cfg dspace/dspace/target/dspace-installer
-
+COPY ./rootfs/scripts/is-db-up.sh dspace/dspace/target/dspace-installer
 # Install root filesystem
 ADD ./rootfs /
 
 #  Install and clean
 RUN cd dspace/dspace/target/dspace-installer \
+    && service postgresql start \
+    && ./is-db-up.sh \
+    && pg_dropcluster --stop 9.5 main \
+    && pg_createcluster --locale=pt_BR.utf8 --start 9.5 main \
+    # Create user and schema
+    && sudo -u postgres psql -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
+    && sudo -u postgres psql -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
+    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.0.sql \
+    # Create a new schema in this database named "extensions" (or whatever you want to name it)
+    && sudo -u postgres psql -c "CREATE SCHEMA extensions;" \
+    # Enable this extension in this new schema
+    && sudo -u postgres psql -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" \
+    # Determine what your database "search_path" is set to
+    # (the search_path is where your database will look for extensions)
+    && sudo -u postgres psql -c "SHOW search_path;" \
+    # Update your database's "search_path" to also search the new "extensions" schema.
+    # You are just appending it on the end of the existing comma-separated list.
+    && sudo -u postgres psql -c "ALTER DATABASE dspace SET search_path TO public,dspace,extensions;" \
+    # Grant rights to call functions in the extensions schema to your dspace user
+    && sudo -u postgres psql -c "GRANT USAGE ON SCHEMA extensions TO dspace;" \
     && ant fresh_install \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
