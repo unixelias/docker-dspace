@@ -1,6 +1,9 @@
 sudo: required
 language: ruby
+addons:
+    postgresql: "9.5"
 services:
+  - postgresql
   - docker
 before_script:
   - ./linter.sh
@@ -10,14 +13,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get -y install docker-ce
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-  - sudo /etc/init.d/postgresql stop;
-  - docker run -d -p 127.0.0.1:5432:5432 --name postgres -h postgres postgres;
-  - ./docker/dev/rootfs/scripts/is-db-up.sh
-  - docker ps -a;
-  - psql -h 127.0.0.1 -p 5432 -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" -U postgres;
-  - psql -h 127.0.0.1 -p 5432 -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" -U postgres;
-  - psql -h 127.0.0.1 -p 5432 -c "CREATE EXTENSION pgcrypto;" -U postgres;
 script:
+  - sudo /etc/init.d/postgresql start
   - ./build.sh
 after_success:
   - ./repo_build.sh
