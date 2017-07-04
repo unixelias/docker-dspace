@@ -4,7 +4,19 @@ services:
   - docker
 before_script:
   - ./linter.sh
+before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y install docker-ce
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  - sudo /etc/init.d/postgresql stop;
+  - docker run -d -p 127.0.0.1:5432:5432 --name postgres -h postgres postgres;
+  - ./docker/dev/rootfs/scripts/is-db-up.sh
+  - docker ps -a;
+  - psql -h 127.0.0.1 -p 5432 -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" -U postgres;
+  - psql -h 127.0.0.1 -p 5432 -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" -U postgres;
+  - psql -h 127.0.0.1 -p 5432 -c "CREATE EXTENSION pgcrypto;" -U postgres;
 script:
   - ./build.sh
 after_success:
@@ -14,3 +26,10 @@ env:
   - secure: psE2IviJsXo8tvVO/n2y3oO4Hk7MvXn0x3TucVWEgcBQenT5sw0hoKz5Mb9gAtPa/1NDfiEGyd5r2+wFG6iRTQd/0F1NiqsIe3ck3bLyRgvaX58t7D4wSLP7ktqGA8lj1XBEzMZbj6wFLTzlAZEhM0PeA2tcTYXseRhue/B5TxRTDTdsj9UpTu2NtJyYJ3Xli0QCuiZuB/frnOFuJZeu3QgBeTCNHmrHhx0jKKjcnBHUVxr+s61ZFphwJMpp/rmnmS7xrSERtoyQsHXMbNILSgKLF/ozHVOuYgEJNXRppdiqCKYNs/5EMgBNaxTsHKKKrXvvE6DSkCxG+wp+UioHOucsO14UnL/nVueKYI912DQhNhFMHW6AX4jzKcSaH58gnlt+pS4idEfd+eAZXBr5p316gfyTYryKVFqZWV5wNF69ZoHZcDUAyFuQ6Ev2eUo8iKytemqlyh13tNPtRLb+9Mo9C7Viz2P/VM90tl0zfWYjPJuxBm39kvnHTTguolFTu1vKh5WIzta9mA+MRaKUk/f6BK6J64EVL0myoqhtKktITfe78hT+HB8d5AF5D/6DUlhjcAUD6yampWHtdho8AOLPjzCPNzzIijDqrQ3LyQVXqLiw2HJUnwPOVhuspMotFSzrGhKcNcWkhkN1W0Sv8ZmIMxSazAfr4PR05lJExms=
   - secure: YFUaCjCE5gya7tNJg5dvmCatIhXjL9oWpCvSntbw2kkHhlp0fTyuQ8k2OyZJR5ZAzrnzoMTS/nSr1qZ6LoxRkNNnCClgvHJWPRobCjeWkVSRv1R2cLUK6+Cpnk65B9DTzN1L+jI4RhRi0LspMKYbrFoc8JT+djYOo2jnVc7SJ4+gCggzZLvO1GT0OYKybWC27WXd0J5SMU/HfYhqDTjUtSiljclRO0qRMAF/gDhA1I7AfTHgqz04oKiVG2+JR7Kp8R9B8HL6aGwad1taAjauwr49RD6TmGo47rgJGHj+x+NlWk+pt8V/XL7NCBJ4RjvpMq9+iB4eJMsUGUxvMpmYmPBWbC6XjXR7IfYEtfxqzWEs7IWCV8uljO1NRMMRoMUghRTNq+fhzQXS2HVu7idEljIV9YvT9jNf/JJTonu58n1JoyCZknG4b9HZsPGUHpGXWWnRtpwNTau5pw1MeYP5Xef4HaFt5Rbniqa0PaSBecAeCOsPBDJp06QeITzRB8hwhB0bQCvC7n/BQEQiELCNnDmyWRpA75U7lUYWKvJodTqLa9v4PT5fViPxxya3nrBZl485JNUA11Kw7h9Kcd9VAn7BK14Ze8r8jxd5NcguROcgvI9LbWLkRvvfz2fpH8PwcKWUW35QH7mmSrA8nOkv5f6rnFSjlbCMczaeyKmYuik=
   - secure: FUXiEQ2Yc21Sp+p7mUeQxYG7aDQiTx0ACGDhugVbHqT7aMM2cZA2NhoNc0yqbX5jHkp5mQ79UdUCZPtCcS4Kfva7D0Q42JGNwco+3iu9JGNL+uL7Of8q8z67EH2kqeVkfvJOAC44qRfzbaUa198zOZ4IuWBu29f6FluFtGQ4e5+drYw3lLpKZamoCNyHkuoQbLdJv1oqmj6MmT2JmhEV4y//LTeAAG9GkLqv36JDrUNV62bHqt+OutWw0/O6Wbdj8UaeQxlU5KLGH+9xwRR6cwmhzQ8FCjF+/AAJuBp68L9I7BdMumdah0aDEr72BPLdpMBnXKlCxVJwk4b9aZP4Eq5MSVRn/4sl2ktGR+L9Maa0o+7xYWticg6C403UAqrJcTiW66XiaLhSMosD20wvewtb02kXVgUMzKvqfbOpcHydZqIfAQX2yqBexgQYANamX6qTCA5EbV4SyCxV4zkq0P7epvpUsBJrxlNl3xc/ZLkysrnCq+GdVm805MV83ybo8nkD8gx6rL4iKZC3yOvY8UfyIDkI/uWGChRDJ0yNgO9TTJhgaUeLsqOM/aU4CTuIxUBatdyvmluPGvG5PQqdKfR6AmvoRJHjYuzWph/OojwBl8jPz0NF6mbZ+Mz3Z8PE9FLqCDQmnkWIQdH7ozkyghAn+batwdRMvjTactOU2Y4=
+  - POSTGRES_DB_HOST=postgres
+  - POSTGRES_ADMIN_USER=postgres
+  - POSTGRES_ADMIN_PASSWORD=admin
+  - POSTGRES_SCHEMA=dspace
+  - POSTGRES_USER=dspace
+  - POSTGRES_PASSWORD=password
+  - DB=localhost
