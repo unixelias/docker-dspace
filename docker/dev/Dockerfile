@@ -96,21 +96,21 @@ RUN cd dspace/dspace/target/dspace-installer \
     && /etc/init.d/postgresql restart \
     && ./is-db-up.sh \
     # Create user and schema
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.0.sql \
+    && sudo -u postgres psql -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
+    && sudo -u postgres psql -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
+    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.0.sql \
     # Create a new schema in this database named "extensions" (or whatever you want to name it)
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "CREATE SCHEMA extensions;" \
+    && sudo -u postgres psql -c "CREATE SCHEMA extensions;" \
     # Enable this extension in this new schema
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" \
+    && sudo -u postgres psq -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" \
     # Determine what your database "search_path" is set to
     # (the search_path is where your database will look for extensions)
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "SHOW search_path;" \
+    && sudo -u postgres psql -c "SHOW search_path;" \
     # Update your database's "search_path" to also search the new "extensions" schema.
     # You are just appending it on the end of the existing comma-separated list.
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "ALTER DATABASE dspace SET search_path TO public,dspace,extensions;" \
+    && sudo -u postgres psql -c "ALTER DATABASE dspace SET search_path TO public,dspace,extensions;" \
     # Grant rights to call functions in the extensions schema to your dspace user
-    && sudo -u postgres psql -W postgres -h 127.0.0.1 -p 5432 -c "GRANT USAGE ON SCHEMA extensions TO dspace;" \
+    && sudo -u postgres psql -c "GRANT USAGE ON SCHEMA extensions TO dspace;" \
     && ant fresh_install \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
