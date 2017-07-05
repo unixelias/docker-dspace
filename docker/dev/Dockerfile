@@ -113,11 +113,11 @@ RUN cd dspace/dspace/target/dspace-installer \
     && sudo -u postgres psql -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
     && sudo -u postgres psql -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
     && sudo ls /usr/share/postgresql \
-    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.6/extension/pgcrypto--1.0.sql \
+    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.2.sql \
     # Create a new schema in this database named "extensions" (or whatever you want to name it)
     && sudo -u postgres psql -c "CREATE SCHEMA extensions;" \
     # Enable this extension in this new schema
-    && sudo -u postgres psq -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" \
+    && sudo -u postgres psql -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" \
     # Determine what your database "search_path" is set to
     # (the search_path is where your database will look for extensions)
     && sudo -u postgres psql -c "SHOW search_path;" \
