@@ -95,10 +95,25 @@ RUN cd dspace/dspace/target/dspace-installer \
     && /etc/init.d/postgresql reload \
     && /etc/init.d/postgresql restart \
     && ./is-db-up.sh \
+    #Convert to UTF-8
+    #First, we need to drop template1. Templates can’t be dropped, so we first modify it so t’s an ordinary database:
+    && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';" \
+    #Now we can drop it:
+    && sudo -u postgres psql -c "DROP DATABASE template1;" \
+    #Now its time to create database from template0, with a new default encoding:
+    && sudo -u postgres psql -c "CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';" \
+    #Now modify template1 so it’s actually a template:
+    && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';" \
+    #Now switch to template1 and VACUUM FREEZE the template
+    && sudo -u postgres psql -c "\c template1" \
+    && sudo -u postgres psql -c "VACUUM FREEZE;" \
+    && /etc/init.d/postgresql reload \
+    && /etc/init.d/postgresql restart \
     # Create user and schema
     && sudo -u postgres psql -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
     && sudo -u postgres psql -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
-    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.0.sql \
+    && sudo ls /usr/share/postgresql \
+    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.6/extension/pgcrypto--1.0.sql \
     # Create a new schema in this database named "extensions" (or whatever you want to name it)
     && sudo -u postgres psql -c "CREATE SCHEMA extensions;" \
     # Enable this extension in this new schema
