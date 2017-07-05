@@ -12,8 +12,8 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 
 # Environment variables
 ENV DSPACE_VERSION=6.0 \
-    TOMCAT_MAJOR=9 \
-    TOMCAT_VERSION=9.0.0.M21 \
+    TOMCAT_MAJOR=8 \
+    TOMCAT_VERSION=8.5.16 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.0
 
@@ -35,6 +35,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     git \
+    sudo \
     unzip \
     xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -47,7 +48,11 @@ RUN apt-get update \
     default-jdk default-jre \
     default-jre \
     locales \
+    postgresql \
     postgresql-client \
+    postgresql-contrib \
+    python-software-properties \
+    software-properties-common \
     vim \
     && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -80,12 +85,37 @@ RUN mkdir -p dspace \
     && cd dspace && ../maven/bin/mvn -q package
 
 COPY ./rootfs/dspace/config/local.cfg dspace/dspace/target/dspace-installer
-
+COPY ./rootfs/scripts/is-db-up.sh dspace/dspace/target/dspace-installer
 # Install root filesystem
 ADD ./rootfs /
 
 #  Install and clean
 RUN cd dspace/dspace/target/dspace-installer \
+    && /etc/init.d/postgresql start \
+    && /etc/init.d/postgresql reload \
+    && /etc/init.d/postgresql restart \
+    && ./is-db-up.sh \
+    #### Convert to UTF-8 source: https://gist.github.com/amolkhanorkar/8706915
+    #First, we need to drop template1. Templates can’t be dropped, so we first modify it so t’s an ordinary database:
+    && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';" \
+    #Now we can drop it:
+    && sudo -u postgres psql -c "DROP DATABASE template1;" \
+    #Now its time to create database from template0, with a new default encoding:
+    && sudo -u postgres psql -c "CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';" \
+    #Now modify template1 so it’s actually a template:
+    && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';" \
+    #Now switch to template1 and VACUUM FREEZE the template
+    && sudo -u postgres psql -c "\c template1" \
+    && sudo -u postgres psql -c "VACUUM FREEZE;" \
+    #### Finish conversion
+    && /etc/init.d/postgresql reload \
+    && /etc/init.d/postgresql restart \
+    # Create user and schema
+    && sudo -u postgres psql -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
+    && sudo -u postgres psql -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
+    # Enable extension pgcrypto
+    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.2.sql \
+    && sudo -u postgres psql --username=postgres dspace -c "CREATE EXTENSION pgcrypto" \
     && ant fresh_install \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
