@@ -95,7 +95,7 @@ RUN cd dspace/dspace/target/dspace-installer \
     && /etc/init.d/postgresql reload \
     && /etc/init.d/postgresql restart \
     && ./is-db-up.sh \
-    #Convert to UTF-8
+    #Convert to UTF-8 source: https://gist.github.com/amolkhanorkar/8706915
     #First, we need to drop template1. Templates can’t be dropped, so we first modify it so t’s an ordinary database:
     && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';" \
     #Now we can drop it:
