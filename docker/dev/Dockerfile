@@ -12,8 +12,8 @@ LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" 
 
 # Environment variables
 ENV DSPACE_VERSION=6.0 \
-    TOMCAT_MAJOR=7 \
-    TOMCAT_VERSION=7.0.78 \
+    TOMCAT_MAJOR=8 \
+    TOMCAT_VERSION=8.5.16 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.0
 
@@ -70,9 +70,9 @@ RUN mkdir -p maven \
     && rm -rf maven.tar.gz
 
 #Some configs for 6.0
-COPY setenv.sh "$CATALINA_HOME"/bin
-COPY server.xml "$CATALINA_HOME"/conf
-COPY local.cfg dspace/config
+COPY ./config/setenv.sh "$CATALINA_HOME"/bin
+COPY ./config/server.xml "$CATALINA_HOME"/conf
+COPY ./config/local.cfg dspace/config
 
 
 # Build, install and clean
@@ -90,6 +90,8 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 
 # Install root filesystem
 ADD ./rootfs /
+
+COPY ./config/local.cfg /dspace/config
 
 WORKDIR /dspace
 

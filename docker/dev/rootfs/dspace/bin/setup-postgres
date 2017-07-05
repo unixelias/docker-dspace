@@ -13,7 +13,7 @@ POSTGRES_ADMIN_PASSWORD=${POSTGRES_ADMIN_PASSWORD}
 if [ -z $POSTGRES_DB_HOST -a -z $POSTGRES_DB_PORT ]; then
   echo "Please create a postgres container and link it to this one:"
   echo "> docker run -d --name dspace_db postgres"
-  echo "> docker run --link dspace_db:postgres -p 8080:8080 1science/dspace setup-postgres"
+  echo "> docker run --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace setup-postgres"
   exit 1
 fi
 
@@ -38,7 +38,7 @@ if [ $USER_EXISTS -eq 1 ]; then
 fi
 
 # Configure database in dspace.cfg
-sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_SCHEMA}#" ${DSPACE_CFG}
+sed -i "s#db.url = jdbc:postgresql://postgres:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_SCHEMA}#" ${DSPACE_CFG}
 sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}
 sed -i "s#db.password = dspace#db.password = ${POSTGRES_PASSWORD}#" ${DSPACE_CFG}
 echo "Dspace configuration changed"
@@ -46,7 +46,7 @@ echo "Dspace configuration changed"
 # Install extension pgcrypto
 EXTENSION_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -U "$POSTGRES_ADMIN_USER" -c "SELECT extname FROM  pg_extension" | cut -d \| -f 3 | grep "pgcrypto" 2>&1 > /dev/null;echo $?)
 if [ "$EXTENSION_EXISTS" -eq 1 ]; then
-  psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto;" 2>&1 > /dev/null
+  psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d dspace -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto;" 2>&1 > /dev/null
   ## Create a new schema in this database named "extensions" (or whatever you want to name it)
   #psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE SCHEMA extensions;" 2>&1 > /dev/null
   ## Enable this extension in this new schema
