@@ -10,4 +10,6 @@ shopt -s extglob
 
 
 #Exclusivo para DEV version
+docker build -t unixelias/postgres-dspace:9.6-alpha compose/postgres && docker push unixelias/postgres-dspace:9.6-alpha
+
 docker build -t unixelias/docker-dspace:6.0.1-alpha docker/dev && docker push unixelias/docker-dspace:6.0.1-alpha

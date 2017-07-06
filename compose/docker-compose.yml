@@ -1,14 +1,14 @@
 version: "2"
 services:
   postgres:
-    hostname: 'postgres'
+    build: ./postgres
+    hostname: postgres
     restart: always
-    image: postgres:latest
     volumes:
       - db_data:/var/lib/postgresql/data
 
   dspace:
-    image: unixelias/docker-dspace:5.6-alpha2
+    image: unixelias/docker-dspace:6.0.1-alpha
     ports:
       - 8080:8080
     depends_on:
