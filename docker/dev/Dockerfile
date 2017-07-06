@@ -31,24 +31,25 @@ WORKDIR /tmp
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
+    curl \
+    locales \
     unzip \
+    vim \
     xz-utils \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
+    && locale-gen pt_BR.UTF-8
+
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
-RUN apt-get update \
+RUN apt-get update && apt-get upgrade -y\
     && apt-get install -y \
     ant \
-    curl \
     default-jdk \
     default-jre \
-    locales \
     postgresql-client \
-    vim \
-    && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
 # Install runtime and dependencies
 # Getting and unpacking Dspace
@@ -73,11 +74,13 @@ RUN mkdir -p maven \
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
 COPY ./config/local.cfg dspace/config
-
+COPY ./config/dspace.cfg dspace/config
 
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
+    && cp ../../config/local.cfg ./config \
+    && cp ../../config/dspace.cfg ./config \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
@@ -92,6 +95,7 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 ADD ./rootfs /
 
 COPY ./config/local.cfg /dspace/config
+COPY ./config/dspace.cfg /dspace/config
 
 WORKDIR /dspace
 
