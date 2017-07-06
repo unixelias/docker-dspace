@@ -7,7 +7,7 @@ shopt -s extglob
 #       * ) docker build -t unixelias/docker-dspace:$i docker/$i ;;
 #  esac
 #done
-###Build DB
+### Build DB
 # docker build -t unixelias/postgres-dspace:9.6-alpha docker/postgres && docker push unixelias/postgres-dspace:9.6-alpha
 
 #Exclusivo para DEV version

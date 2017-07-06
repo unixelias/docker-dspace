@@ -32,6 +32,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     curl \
+    git \
     locales \
     unzip \
     vim \
@@ -52,12 +53,6 @@ RUN apt-get update && apt-get upgrade -y\
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
-# Getting and unpacking Dspace
-RUN mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-    && rm -rf dspace.tar.gz
-
 # Getting and unpacking Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
@@ -70,14 +65,13 @@ RUN mkdir -p maven \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
-#Some configs for 6.0
+# Some configs for 6.0
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
-COPY ./config/local.cfg dspace/config
-COPY ./config/dspace.cfg dspace/config
 
 # Build, install and clean
-RUN cd dspace && ../maven/bin/mvn -q package \
+RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
+    && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && cp ../../config/local.cfg ./config \
     && cp ../../config/dspace.cfg ./config \
@@ -97,9 +91,13 @@ ADD ./rootfs /
 COPY ./config/local.cfg /dspace/config
 COPY ./config/dspace.cfg /dspace/config
 
-WORKDIR /dspace
-
 VOLUME /dspace/assetstore
+VOLUME /dspace/assetstore
+VOLUME /dspace/config
+VOLUME /dspace/history
+VOLUME /dspace/log
+
+WORKDIR /dspace
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
