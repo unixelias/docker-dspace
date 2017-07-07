@@ -6,7 +6,7 @@ FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
-      Version="5.6-alpha" \
+      Version="6.0-alpha" \
       Architecture="x86_64" \
       Dockerfile_location="/root/buildinfo"
 
@@ -25,9 +25,13 @@ ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
+# Create Dspace user and adding to the sudoers group
+RUN useradd -ms /bin/bash dspace \
+    && usermod -a -G root dspace
+
 WORKDIR /tmp
 
-# Install pre dependencies
+# Install pre dependencies and set locales
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
@@ -40,7 +44,6 @@ RUN apt-get update \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
     && locale-gen pt_BR.UTF-8
-
 ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
@@ -73,8 +76,6 @@ COPY ./config/server.xml "$CATALINA_HOME"/conf
 RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
     && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
-    && cp ../../config/local.cfg ./config \
-    && cp ../../config/dspace.cfg ./config \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
@@ -88,10 +89,6 @@ RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
 # Install root filesystem
 ADD ./rootfs /
 
-COPY ./config/local.cfg /dspace/config
-COPY ./config/dspace.cfg /dspace/config
-
-VOLUME /dspace/assetstore
 VOLUME /dspace/assetstore
 VOLUME /dspace/config
 VOLUME /dspace/history

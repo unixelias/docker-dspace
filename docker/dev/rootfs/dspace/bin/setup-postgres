@@ -38,7 +38,7 @@ if [ $USER_EXISTS -eq 1 ]; then
 fi
 
 # Configure database in dspace.cfg
-sed -i "s#db.url = jdbc:postgresql://postgres:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_SCHEMA}#" ${DSPACE_CFG}
+sed -i "s#db.url = jdbc:postgresql://localhost:5432/dspace#db.url = jdbc:postgresql://${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_SCHEMA}#" ${DSPACE_CFG}
 sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}
 sed -i "s#db.password = dspace#db.password = ${POSTGRES_PASSWORD}#" ${DSPACE_CFG}
 echo "Dspace configuration changed"
@@ -47,18 +47,8 @@ echo "Dspace configuration changed"
 EXTENSION_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -U "$POSTGRES_ADMIN_USER" -c "SELECT extname FROM  pg_extension" | cut -d \| -f 3 | grep "pgcrypto" 2>&1 > /dev/null;echo $?)
 if [ "$EXTENSION_EXISTS" -eq 1 ]; then
   psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d dspace -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto;" 2>&1 > /dev/null
-  ## Create a new schema in this database named "extensions" (or whatever you want to name it)
-  #psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE SCHEMA extensions;" 2>&1 > /dev/null
-  ## Enable this extension in this new schema
-  #psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto SCHEMA extensions;" 2>&1 > /dev/null
-  ## Update your database's "search_path" to also search the new "extensions" schema.
-  ## You are just appending it on the end of the existing comma-separated list.
-  #psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "ALTER DATABASE dspace SET search_path TO '\$user',public,extensions;" 2>&1 > /dev/null
-  ## Grant rights to call functions in the extensions schema to your dspace user
-  #psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "GRANT USAGE ON SCHEMA extensions TO $POSTGRES_USER;" 2>&1 > /dev/null
   echo "Extension pgcrypto installed"
 fi
-
 
 # Create DSpace administrator
 dspace create-administrator -e ${ADMIN_EMAIL:-admin@mail.com} -f ${ADMIN_FIRSTNAME:-DSpace} -l ${ADMIN_LASTNAME:-Admin} -p ${ADMIN_PASSWD:-admin123} -c ${ADMIN_LANGUAGE:-en}
