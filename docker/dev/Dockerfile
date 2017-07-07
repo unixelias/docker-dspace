@@ -25,39 +25,35 @@ ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
+# Create Dspace user and adding to the sudoers group
 RUN useradd -ms /bin/bash dspace \
     && usermod -a -G root dspace
 
 WORKDIR /tmp
 
-# Install pre dependencies
+# Install pre dependencies and set locales
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
+    curl \
     git \
-    sudo \
+    locales \
     unzip \
+    vim \
     xz-utils \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
+    && locale-gen pt_BR.UTF-8
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
-RUN apt-get update \
+RUN apt-get update && apt-get upgrade -y\
     && apt-get install -y \
     ant \
-    curl \
-    default-jdk default-jre \
+    default-jdk \
     default-jre \
-    locales \
-    postgresql \
     postgresql-client \
-    postgresql-contrib \
-    python-software-properties \
-    software-properties-common \
-    vim \
-    && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
 # Install runtime and dependencies
 # Getting and unpacking Tomcat
@@ -72,51 +68,15 @@ RUN mkdir -p maven \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
-#Some configs for 6.0
-COPY setenv.sh "$CATALINA_HOME"/bin
-COPY server.xml "$CATALINA_HOME"/conf
+# Some configs for 6.0
+COPY ./config/setenv.sh "$CATALINA_HOME"/bin
+COPY ./config/server.xml "$CATALINA_HOME"/conf
 
-# Get and build Dspace from source
-# Getting and unpacking Dspace
-RUN mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-    && rm -rf dspace.tar.gz \
-    && cd dspace && ../maven/bin/mvn -q package
-
-COPY ./rootfs/dspace/config/local.cfg dspace/dspace/target/dspace-installer
-COPY ./rootfs/scripts/is-db-up.sh dspace/dspace/target/dspace-installer
-# Install root filesystem
-ADD ./rootfs /
-
-#  Install and clean
-RUN cd dspace/dspace/target/dspace-installer \
-    && /etc/init.d/postgresql start \
-    && /etc/init.d/postgresql reload \
-    && /etc/init.d/postgresql restart \
-    && ./is-db-up.sh \
-    #### Convert to UTF-8 source: https://gist.github.com/amolkhanorkar/8706915
-    #First, we need to drop template1. Templates can’t be dropped, so we first modify it so t’s an ordinary database:
-    && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = FALSE WHERE datname = 'template1';" \
-    #Now we can drop it:
-    && sudo -u postgres psql -c "DROP DATABASE template1;" \
-    #Now its time to create database from template0, with a new default encoding:
-    && sudo -u postgres psql -c "CREATE DATABASE template1 WITH TEMPLATE = template0 ENCODING = 'UNICODE';" \
-    #Now modify template1 so it’s actually a template:
-    && sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'template1';" \
-    #Now switch to template1 and VACUUM FREEZE the template
-    && sudo -u postgres psql -c "\c template1" \
-    && sudo -u postgres psql -c "VACUUM FREEZE;" \
-    #### Finish conversion
-    && /etc/init.d/postgresql reload \
-    && /etc/init.d/postgresql restart \
-    # Create user and schema
-    && sudo -u postgres psql -c "CREATE USER dspace WITH NOSUPERUSER PASSWORD 'dspace';" \
-    && sudo -u postgres psql -c "CREATE DATABASE dspace WITH ENCODING UNICODE OWNER dspace;" \
-    # Enable extension pgcrypto
-    && sudo -u postgres psql -d dspace -f /usr/share/postgresql/9.5/extension/pgcrypto--1.2.sql \
-    && sudo -u postgres psql --username=postgres dspace -c "CREATE EXTENSION pgcrypto" \
-    && ant fresh_install \
+# Build, install and clean
+RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
+    && cd dspace && ../maven/bin/mvn -q package \
+    && cd dspace/target/dspace-installer \
+    && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
@@ -126,9 +86,15 @@ RUN cd dspace/dspace/target/dspace-installer \
     && rm -rf /usr/local/tomcat/webapps/xmlui \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /dspace
+# Install root filesystem
+ADD ./rootfs /
 
 VOLUME /dspace/assetstore
+VOLUME /dspace/config
+VOLUME /dspace/history
+VOLUME /dspace/log
+
+WORKDIR /dspace
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \

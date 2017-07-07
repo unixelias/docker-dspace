@@ -1,9 +1,6 @@
 sudo: required
 language: ruby
-addons:
-    postgresql: "9.5"
 services:
-  - postgresql
   - docker
 before_script:
   - ./linter.sh
@@ -14,7 +11,6 @@ before_install:
   - sudo apt-get -y install docker-ce
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
 script:
-  - sudo /etc/init.d/postgresql start
   - ./build.sh
 after_success:
   - ./repo_build.sh
