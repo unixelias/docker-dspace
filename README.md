@@ -1,31 +1,31 @@
-[![](https://badge.imagelayers.io/1science/dspace:latest.svg)](https://imagelayers.io/?images=1science/dspace:latest 'Get your own badge on imagelayers.io')
+[![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/version/ubuntu.svg)](https://microbadger.com/images/ubuntu "Get your own version badge on microbadger.com")
 
 # What is DSpace?
 
 ![logo](https://wiki.duraspace.org/download/attachments/31655033/DSpace_logo_1in.png)
 
-[DSpace](https://wiki.duraspace.org/display/DSDOC5x/Introduction) is an open source repository software package typically used for creating open access repositories for scholarly and/or published digital content. While DSpace shares some feature overlap with content management systems and document management systems, the DSpace repository software serves a specific need as a digital archives system, focused on the long-term storage, access and preservation of digital content.
+[DSpace](https://wiki.duraspace.org/display/DSDOC6x/Introduction) is an open source repository software package typically used for creating open access repositories for scholarly and/or published digital content. While DSpace shares some feature overlap with content management systems and document management systems, the DSpace repository software serves a specific need as a digital archives system, focused on the long-term storage, access and preservation of digital content.
 
-This image is based on official [Java image](https://hub.docker.com/_/java/) and use [Tomcat](http://tomcat.apache.org/) to run DSpace as defined in the [installation guide](https://wiki.duraspace.org/display/DSDOC5x/Installing+DSpace).
+This image is based on official [Ubuntu image](https://hub.docker.com/_/ubuntu/) and use [Tomcat](http://tomcat.apache.org/) to run DSpace as defined in the [installation guide](https://wiki.duraspace.org/display/DSDOC6x/Installing+DSpace).
 
 # Usage
 
-DSpace use [PostgreSQL](http://www.postgresql.org/) as database. 
+DSpace use a Custom [PostgreSQL](http://www.postgresql.org/) as database.
 
 We might use an external database or create a PostgreSQL container linked to the DSpace container.
 
 ## Postgres as a container
 
-First, we have to create the PostgreSQL container:
+First, we have to create the [PostgreSQL](https://hub.docker.com/r/unixelias/postgres-dspace/) container:
 
 ```
-docker run -d --name dspace_db -p 5432:5432 postgres
+docker run -d --name dspace_db -p 5432:5432 unixelias/postgres-dspace
 ```
 
 then run DSpace linking the PostgreSQL container:
 
 ```
-docker run -d --link dspace_db:postgres -p 8080:8080 1science/dspace
+docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace
 ```
 
 By default the database schema is created with the name `dspace` for a user `dspace` and password `dspace`, but it's possible to override this default settings :
@@ -36,7 +36,7 @@ docker run -d --link dspace_db:postgres \
         -e POSTGRES_SCHEMA=my_dspace \
         -e POSTGRES_USER=my_user \
         -e POSTGRES_PASSWORD=my_password \
-        -p 8080:8080 1science/dspace
+        -p 8080:8080 unixelias/docker-dspace
 ```
 
 We might also used the Docker compose project in the `sample` directory.
@@ -51,8 +51,8 @@ When you use an external Postgres, you have to set some environment variables :
   - `POSTGRES_PASSWORD` (optional): The password of the user used by DSpace (`dspace` by default)
   - `POSTGRES_ADMIN_USER` (optional): The admin user creating the Database and the user (`postgres` by default)
   - `POSTGRES_ADMIN_PASSWORD` (optional): The password of the admin user
-  
-  
+
+
 ```
 docker run -d  \
         -e POSTGRES_DB_HOST=my_host \
@@ -61,7 +61,7 @@ docker run -d  \
         -e POSTGRES_SCHEMA=my_dspace \
         -e POSTGRES_USER=my_user \
         -e POSTGRES_PASSWORD=my_password \
-        -p 8080:8080 1science/dspace
+        -p 8080:8080 unixelias/docker-dspace
 ```
 
 
@@ -81,7 +81,7 @@ DSpace consumed a lot of memory, and sometimes we don't really need all the DSpa
 ```
 docker run -d --link dspace_db:postgres \
         -e DSPACE_WEBAPPS="jspui xmlui rest" \
-        -p 8080:8080 1science/dspace
+        -p 8080:8080 unixelias/docker-dspace
 ```
 
 The command above only installed the webapps `jspui` `xmlui` and `rest`.
@@ -89,7 +89,7 @@ The command above only installed the webapps `jspui` `xmlui` and `rest`.
 
 # Build
 
-This project is configured as an [automated build in Dockerhub](https://hub.docker.com/r/1science/java/).
+This project is configured as an [automated build in Dockerhub](https://hub.docker.com/r/unixelias/docker-dspace/).
 
 Each branch give the related image tag.  
 
