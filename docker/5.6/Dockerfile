@@ -12,7 +12,7 @@ ARG VERSION
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL Name="Dspace" \
-      Version="6.0" \
+      Version="5.6" \
       Architecture="x86_64" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Dspace" \
@@ -22,12 +22,12 @@ LABEL Name="Dspace" \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="@unixelias at UFVJM" \
       org.label-schema.version=$VERSION \
-      org.label-schema.version="6.0" \
+      org.label-schema.version="5.6-alpha" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
 # Environment variables
-ENV DSPACE_VERSION=6.0 \
+ENV DSPACE_VERSION=5.6 \
     TOMCAT_MAJOR=8 \
     TOMCAT_VERSION=8.5.16 \
     MAVEN_MAJOR=3 \
@@ -89,7 +89,7 @@ COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
 
 # Build, install and clean
-RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
+RUN git clone https://github.com/unixelias/dspace.git -b dspace-5_x dspace \
     && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \

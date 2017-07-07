@@ -5,10 +5,26 @@
 FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
-LABEL Name="Dspace para implementação do Repositório Institucional da UFVJM" \
-      Version="6.0-alpha" \
+
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+# Build-time metadata as defined at http://label-schema.org
+LABEL Name="Dspace" \
+      Version="6.0" \
       Architecture="x86_64" \
-      Dockerfile_location="/root/buildinfo"
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.name="Dspace" \
+      org.label-schema.description="Implementação do Dspace para o Repositório Institucional da UFVJM" \
+      org.label-schema.url="http://www.dspace.org/" \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
+      org.label-schema.vendor="@unixelias at UFVJM" \
+      org.label-schema.version=$VERSION \
+      org.label-schema.version="6.0" \
+      org.label-schema.schema-version="1.0" \
+      org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
 # Environment variables
 ENV DSPACE_VERSION=6.0 \

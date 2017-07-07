@@ -5,10 +5,26 @@
 FROM debian:jessie
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
-LABEL Name="PostgreSQL prepared for Dspace 6.x" \
-      Version="9.6-alpha" \
+
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+# Build-time metadata as defined at http://label-schema.org
+LABEL Name="Dspace" \
+      Version="5.6" \
       Architecture="x86_64" \
-      Dockerfile_location="/root/buildinfo"
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.name="PostgreSQL" \
+      org.label-schema.description="Custom PostgreSQL image to work with Dspace 6.x" \
+      org.label-schema.url="http://postgresql.org" \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
+      org.label-schema.vendor="@unixelias at UFVJM" \
+      org.label-schema.version=$VERSION \
+      org.label-schema.version="9.6-beta" \
+      org.label-schema.schema-version="1.0" \
+      org.label-schema.docker.cmd="docker run -d --name postgres -p 5432:5432 unixelias/postgres-dspace"
 
 RUN set -ex; \
 	if ! command -v gpg > /dev/null; then \

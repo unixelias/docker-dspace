@@ -1,8 +1,8 @@
-[![](https://badge.imagelayers.io/unixelias/docker-dspace:latest.svg)](https://imagelayers.io/?images=unixelias/docker-dspace:latest 'Get your own badge on imagelayers.io')
+[![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own version badge on microbadger.com") [![Build Status](https://travis-ci.org/unixelias/docker-dspace.svg?branch=master)](https://travis-ci.org/unixelias/docker-dspace)
 
 # What is DSpace?
 
-![logo](https://wiki.duraspace.org/download/attachments/31655033/DSpace_logo_1in.png)
+![logo](https://github.com/unixelias/docker-dspace/raw/latest/logo.png)
 
 [DSpace](https://wiki.duraspace.org/display/DSDOC6x/Introduction) is an open source repository software package typically used for creating open access repositories for scholarly and/or published digital content. While DSpace shares some feature overlap with content management systems and document management systems, the DSpace repository software serves a specific need as a digital archives system, focused on the long-term storage, access and preservation of digital content.
 
@@ -19,7 +19,7 @@ We might use an external database or create a PostgreSQL container linked to the
 First, we have to create the [PostgreSQL](https://hub.docker.com/r/unixelias/postgres-dspace/) container:
 
 ```
-docker run -d --name dspace_db -p 5432:5432 unixelias/docker-dspace
+docker run -d --name dspace_db -p 5432:5432 unixelias/postgres-dspace
 ```
 
 then run DSpace linking the PostgreSQL container:

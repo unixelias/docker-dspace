@@ -12,7 +12,7 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - localhost
+      - postgres
     environment:
       - POSTGRES_DB_HOST=localhost
       - POSTGRES_ADMIN_USER=postgres
