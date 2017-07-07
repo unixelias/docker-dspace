@@ -18,7 +18,7 @@ fi
 
 # Remove unused webapps
 # see https://wiki.duraspace.org/display/DSDOC5x/Performance+Tuning+DSpace
-if [ -n $DSPACE_WEBAPPS ]; then
+if [ -n "$DSPACE_WEBAPPS" ]; then
     webapps=($(ls /usr/local/tomcat/webapps | tr -d '/'))
     webapps_to_keep=($(echo "$DSPACE_WEBAPPS solr"))
     for element in ${webapps_to_keep[@]}; do
