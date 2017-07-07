@@ -12,17 +12,17 @@ ARG VERSION
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL Name="Dspace" \
-      Version="6.0-dev" \
+      Version=$VERSION \
       Architecture="x86_64" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Dspace" \
-      org.label-schema.description="Implementação do Dspace para o Repositório Institucional da UFVJM" \
+      org.label-schema.description="Deployment of Dspace to the Institutional Repository of UFVJM" \
       org.label-schema.url="http://www.dspace.org/" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="@unixelias at UFVJM" \
       org.label-schema.version=$VERSION \
-      org.label-schema.version="6.0-dev" \
+      org.label-schema.version="dev" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
