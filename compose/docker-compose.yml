@@ -8,13 +8,13 @@ services:
       - db_data:/var/lib/postgresql/data
 
   dspace:
-    image: unixelias/docker-dspace:6.0-alpha
+    image: unixelias/docker-dspace:6.0
     ports:
       - 8080:8080
     depends_on:
       - localhost
     environment:
-      - POSTGRES_DB_HOST=localhost  
+      - POSTGRES_DB_HOST=localhost
       - POSTGRES_ADMIN_USER=postgres
       - POSTGRES_ADMIN_PASSWORD=admin
       - POSTGRES_SCHEMA=dspace

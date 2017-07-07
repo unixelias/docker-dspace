@@ -13,6 +13,4 @@ docker build -t unixelias/postgres-dspace:9.6-alpha docker/postgres && docker pu
 
 #Exclusivo para DEV version
 
-docker build -t unixelias/docker-dspace:6.0-alpha docker/dev && docker push unixelias/docker-dspace:6.0-alpha
-
-docker build -t unixelias/docker-dspace:6.0-alpha --add-host=postgres:127.0.0.1 docker/dev && docker push unixelias/docker-dspace:6.0-alpha;
+docker build -t unixelias/docker-dspace:6.0 docker/dev && docker push unixelias/docker-dspace:6.0
