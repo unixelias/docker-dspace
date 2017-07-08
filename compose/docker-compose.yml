@@ -1,7 +1,7 @@
 version: "2"
 services:
   postgres:
-    image: unixelias/postgres-dspace:9.6-alpha
+    image: unixelias/postgres-dspace:9.6-dev
     hostname: postgres
     restart: always
     volumes:

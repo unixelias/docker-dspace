@@ -16,7 +16,7 @@ We might use an external database or create a PostgreSQL container linked to the
 
 ## Postgres as a container
 
-We have a custom [PostgreSQL Docker Image](https://hub.docker.com/r/unixelias/postgres-dspace/) [![](https://images.microbadger.com/badges/image/unixelias/postgres-dspace:9.6-dev.svg)](https://microbadger.com/images/unixelias/postgres-dspace:9.6-dev "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/postgres-dspace:9.6-dev.svg)](https://microbadger.com/images/unixelias/postgres-dspace:9.6-dev "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/commit/unixelias/postgres-dspace:9.6-dev.svg)](https://microbadger.com/images/unixelias/postgres-dspace:9.6-dev "Get your own commit badge on microbadger.com")
+We have a custom [PostgreSQL Docker Image](https://hub.docker.com/r/unixelias/postgres-dspace/) used to change default locale of PostgreSQL to pt-BR. If you will use the default english language you may not need this, but it can be useful if you need a custom language. The source is avaliable at docker/postgres/Dockerfile [![](https://images.microbadger.com/badges/image/unixelias/postgres-dspace:9.6-dev.svg)](https://microbadger.com/images/unixelias/postgres-dspace:9.6-dev "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/postgres-dspace:9.6-dev.svg)](https://microbadger.com/images/unixelias/postgres-dspace:9.6-dev "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/commit/unixelias/postgres-dspace:9.6-dev.svg)](https://microbadger.com/images/unixelias/postgres-dspace:9.6-dev "Get your own commit badge on microbadger.com")
 
 First, we have to create the PostgreSQL container:
 
@@ -78,9 +78,9 @@ Note: The security constraint to tunnel request with SSL on the `/rest` endpoint
 
 ## Configure webapps installed
 
-<aside class="notice">
+```
 This development work just deploy `jspui` and `rest`.
-</aside>
+```
 
 DSpace consumed a lot of memory, and sometimes we don't really need all the DSpace webapps. So iy's possible to set an environment variables to control the webapps installed :
 
