@@ -17,7 +17,7 @@ if [ -z $POSTGRES_DB_HOST -a -z $POSTGRES_DB_PORT ]; then
   exit 1
 fi
 
-DSPACE_CFG=/dspace/config/dspace.cfg
+DSPACE_CFG=/dspace/config/local.cfg
 if [ -n $POSTGRES_ADMIN_PASSWORD ]; then
   export PGPASSWORD=$POSTGRES_ADMIN_PASSWORD
 fi
@@ -27,6 +27,13 @@ SCHEMA_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -U "$POSTGRES
 if [ $SCHEMA_EXISTS -eq 1 ]; then
   psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d postgres -U "$POSTGRES_ADMIN_USER" -c "CREATE DATABASE $POSTGRES_SCHEMA;" 2>&1 > /dev/null
   echo "Database '${POSTGRES_SCHEMA}' created"
+fi
+
+# Install extension pgcrypto
+EXTENSION_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -U "$POSTGRES_ADMIN_USER" -d dspace -c "SELECT extname FROM  pg_extension" | cut -d \| -f 3 | grep "pgcrypto" 2>&1 > /dev/null;echo $?)
+if [ "$EXTENSION_EXISTS" -eq 1 ]; then
+  psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d dspace -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto;" 2>&1 > /dev/null
+  echo "Extension 'pgcrypto' installed on '${POSTGRES_SCHEMA}' database"
 fi
 
 # Create user
@@ -42,13 +49,6 @@ sed -i "s#db.url = jdbc:postgresql://postgres:5432/dspace#db.url = jdbc:postgres
 sed -i "s#db.username = dspace#db.username = ${POSTGRES_USER}#" ${DSPACE_CFG}
 sed -i "s#db.password = dspace#db.password = ${POSTGRES_PASSWORD}#" ${DSPACE_CFG}
 echo "Dspace configuration changed"
-
-# Install extension pgcrypto
-EXTENSION_EXISTS=$(psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -U "$POSTGRES_ADMIN_USER" -c "SELECT extname FROM  pg_extension" | cut -d \| -f 3 | grep "pgcrypto" 2>&1 > /dev/null;echo $?)
-if [ "$EXTENSION_EXISTS" -eq 1 ]; then
-  psql -h "$POSTGRES_DB_HOST" -p "$POSTGRES_DB_PORT" -d dspace -U "$POSTGRES_ADMIN_USER" -c "CREATE EXTENSION pgcrypto;" 2>&1 > /dev/null
-  echo "Extension pgcrypto installed"
-fi
 
 # Create DSpace administrator
 dspace create-administrator -e ${ADMIN_EMAIL:-admin@mail.com} -f ${ADMIN_FIRSTNAME:-DSpace} -l ${ADMIN_LASTNAME:-Admin} -p ${ADMIN_PASSWD:-admin123} -c ${ADMIN_LANGUAGE:-en}

@@ -112,6 +112,7 @@ RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
 
 # Install root filesystem
 ADD ./rootfs /
+COPY ./config/local.cfg /dspace/config
 
 VOLUME /dspace/assetstore
 VOLUME /dspace/config
