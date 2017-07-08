@@ -12,7 +12,10 @@ for i in $( ls docker); do
   else
     case "$i" in
         *-test )  ;;
-        * ) docker build -t unixelias/docker-dspace:$i \
+        * ) if [ "$i" == "dev" ]; then
+              i="6.0-dev"
+            fi
+            docker build -t unixelias/docker-dspace:$i \
             --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
             --build-arg VCS_REF=`git rev-parse --short HEAD` \
             --build-arg VERSION="$i" docker/$i \
