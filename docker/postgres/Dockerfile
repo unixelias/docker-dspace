@@ -8,11 +8,10 @@ MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 
 ARG BUILD_DATE
 ARG VCS_REF
-ARG VERSION
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL Name="PostgreSQL" \
-      Version=$VERSION \
+      Version="9.6-dev" \
       Architecture="x86_64" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="PostgreSQL" \
@@ -21,7 +20,7 @@ LABEL Name="PostgreSQL" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="@unixelias at UFVJM" \
-      org.label-schema.version=$VERSION \
+      org.label-schema.version="9.6-dev" \
       org.label-schema.version="dev" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --name postgres -p 5432:5432 unixelias/postgres-dspace"
