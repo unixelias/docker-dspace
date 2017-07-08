@@ -8,11 +8,10 @@ MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 
 ARG BUILD_DATE
 ARG VCS_REF
-ARG VERSION
 
 # Build-time metadata as defined at http://label-schema.org
 LABEL Name="Dspace" \
-      Version=$VERSION \
+      Version="6.0-dev" \
       Architecture="x86_64" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Dspace" \
@@ -21,8 +20,9 @@ LABEL Name="Dspace" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="Elias Alves at UFVJM" \
-      org.label-schema.version=$VERSION \
+      org.label-schema.version="6.0-dev" \
       org.label-schema.version="dev" \
+      org.label-schema.version="source" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
@@ -94,7 +94,7 @@ COPY ./config/server.xml "$CATALINA_HOME"/conf
 # RUN mkdir -p dspace \
 #     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
 #     && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-#     && rm -rf dspace.tar.gz 
+#     && rm -rf dspace.tar.gz
 
 # Build, install and clean
 RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
@@ -112,6 +112,7 @@ RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
 
 # Install root filesystem
 ADD ./rootfs /
+COPY ./config/local.cfg /dspace/config
 
 VOLUME /dspace/assetstore
 VOLUME /dspace/config
