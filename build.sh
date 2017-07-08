@@ -4,11 +4,11 @@ shopt -s extglob
 # for i in $( ls docker); do
 #   if [ "$i" == "postgres" ]; then
 #     ### Build DB
-#     docker build -t unixelias/postgres-dspace:9.6-alpha \
+#     docker build -t unixelias/postgres-dspace:9.6-dev \
 #         --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 #         --build-arg VCS_REF=`git rev-parse --short HEAD` \
-#         --build-arg VERSION=`9.6-alpha` docker/postgres \
-#         && docker push unixelias/postgres-dspace:9.6-alpha
+#         --build-arg VERSION="9.6-dev" docker/postgres \
+#         && docker push unixelias/postgres-dspace:9.6-dev
 #   else
 #     case "$i" in
 #         *-test )  ;;

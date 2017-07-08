@@ -20,7 +20,7 @@ LABEL Name="Dspace" \
       org.label-schema.url="http://www.dspace.org/" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
-      org.label-schema.vendor="@unixelias at UFVJM" \
+      org.label-schema.vendor="Elias Alves at UFVJM" \
       org.label-schema.version=$VERSION \
       org.label-schema.version="dev" \
       org.label-schema.schema-version="1.0" \
@@ -87,6 +87,14 @@ RUN mkdir -p maven \
 # Some configs for 6.0
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
+
+# # Getting and unpacking Dspace
+# # If you wanto to use the release version uncomment this listen_addresses
+# # and remove the 1st line of next "RUN" command " git clone [...]"
+# RUN mkdir -p dspace \
+#     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
+#     && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+#     && rm -rf dspace.tar.gz 
 
 # Build, install and clean
 RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
