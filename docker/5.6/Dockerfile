@@ -16,7 +16,7 @@ LABEL Name="Dspace" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="Elias Alves at UFVJM" \
-      org.label-schema.version="6.0-dev" \
+      org.label-schema.version="5.6-dev" \
       org.label-schema.version="dev" \
       org.label-schema.version="source" \
       org.label-schema.schema-version="1.0" \
@@ -81,11 +81,6 @@ RUN mkdir -p maven \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
-#Some configs for 6.0
-COPY ./config/setenv.sh "$CATALINA_HOME"/bin
-COPY ./config/server.xml "$CATALINA_HOME"/conf
-
-
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
@@ -101,6 +96,7 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 
 # Install root filesystem
 ADD ./rootfs /
+COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/local.cfg /dspace/config
 
 WORKDIR /dspace

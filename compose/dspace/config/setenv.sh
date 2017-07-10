@@ -1,7 +1,7 @@
 export CATALINA_OPTS="$CATALINA_OPTS -Xms512m"
 export CATALINA_OPTS="$CATALINA_OPTS -Xmx2048m"
 export MAVEN_OPTS="-Xmx512m"
-export JAVA_OPTS="-Xmx512M -Xms64M -Dfile.encoding=UTF-8"
+export JAVA_OPTS="-Xmx512M -Xms64M -Dfile.encoding=UTF-8 -Djava.awt.headless=true -Xmx768M -XX:MaxPermSize=256M -XX:+UseParallelGC -XX:MaxGCPauseMillis=1500 -XX:GCTimeRatio=9 -server -XX:+DisableExplicitGC"
 
 # Check for application specific parameters at startup
 if [ -r "$CATALINA_BASE/bin/appenv.sh" ]; then
