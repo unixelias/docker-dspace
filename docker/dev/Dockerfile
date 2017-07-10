@@ -104,7 +104,6 @@ RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
-    && rm -rf /usr/local/tomcat/webapps/oai \
     && rm -rf /usr/local/tomcat/webapps/sword \
     && rm -rf /usr/local/tomcat/webapps/swordv2 \
     && rm -rf /usr/local/tomcat/webapps/xmlui \
