@@ -82,10 +82,9 @@ RUN mkdir -p maven \
     && rm -rf maven.tar.gz
 
 #Some configs for 6.0
-COPY setenv.sh "$CATALINA_HOME"/bin
-COPY server.xml "$CATALINA_HOME"/conf
-COPY local.cfg dspace/config
-
+COPY ./config/setenv.sh "$CATALINA_HOME"/bin
+COPY ./config/server.xml "$CATALINA_HOME"/conf
+COPY ./config/local.cfg dspace/config
 
 # Build, install and clean
 RUN cd dspace && ../maven/bin/mvn -q package \

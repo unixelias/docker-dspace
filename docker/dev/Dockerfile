@@ -33,7 +33,7 @@ ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-$DS
     MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
     TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
 
-ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
+ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace57
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
@@ -77,9 +77,6 @@ RUN mkdir -p maven \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
-#Some configs for 6.0
-COPY ./config/local.cfg dspace/config
-
 # # Getting and unpacking Dspace
 # RUN mkdir -p dspace \
 # && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
@@ -87,11 +84,11 @@ COPY ./config/local.cfg dspace/config
 # && rm -rf dspace.tar.gz
 
 # Build, install and clean
-RUN git clone https://github.com/wtonribeiro/dspace-standard.git -b dspace-5_x dspace \
+RUN git clone https://github.com/wtonribeiro/dspace-standard.git -b dspace-5_x --single-branch dspace \
     && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
-    && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
+    && rm -fr "$CATALINA_HOME/webapps" && mv -f "$DSPACE_HOME/webapps" "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
     && rm -rf /usr/local/tomcat/webapps/oai \
@@ -102,7 +99,7 @@ RUN git clone https://github.com/wtonribeiro/dspace-standard.git -b dspace-5_x d
 
 # Install root filesystem
 ADD ./rootfs /
-COPY ./config/local.cfg /dspace/config
+COPY ./config/local.cfg "$DSPACE_HOME"/config
 
 WORKDIR /dspace
 

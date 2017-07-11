@@ -26,12 +26,12 @@ shopt -s extglob
 #   && docker push unixelias/postgres-dspace:9.6-dev
 
 ## Build DSpace
-
-docker build -t unixelias/docker-dspace:5.6-dev \
-           --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-           --build-arg VCS_REF=`git rev-parse --short HEAD` docker/5.6 \
-           && docker push unixelias/docker-dspace:5.6-dev
-
+# 
+# docker build -t unixelias/docker-dspace:5.6-dev \
+#            --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+#            --build-arg VCS_REF=`git rev-parse --short HEAD` docker/5.6 \
+#            && docker push unixelias/docker-dspace:5.6-dev
+#
 
 docker build -t unixelias/docker-dspace:5.x-dev \
            --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
