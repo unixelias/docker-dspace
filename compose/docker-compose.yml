@@ -1,17 +1,17 @@
 version: "2"
 services:
   postgres:
-    image: postgres
+    image: unixelias/postgres-dspace:9.6-dev
     hostname: postgres
     restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
 
   dspace:
-    #image: unixelias/docker-dspace:5.6-alpha2
+    image: unixelias/docker-dspace:5.6-alpha
     # If you wanto to change the configuration you can build again
     # and add custom config files
-    build: ./dspace
+    #build: ./dspace
     ports:
       - 8080:8080
     depends_on:

@@ -33,7 +33,7 @@ docker build -t unixelias/docker-dspace:5.6-dev \
            && docker push unixelias/docker-dspace:5.6-dev
 
 
-docker build -t unixelias/docker-dspace:6.0-dev \
+docker build -t unixelias/docker-dspace:5.x-dev \
            --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
            --build-arg VCS_REF=`git rev-parse --short HEAD` docker/dev \
-           && docker push unixelias/docker-dspace:6.0-dev
+           && docker push unixelias/docker-dspace:5.x-dev
