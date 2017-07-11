@@ -44,9 +44,13 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     git \
+    locales \
     unzip \
     xz-utils \
+    && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update \
@@ -55,13 +59,10 @@ RUN apt-get update \
     curl \
     default-jdk \
     default-jre \
-    locales \
     postgresql-client \
     vim \
-    && locale-gen pt_BR.UTF-8 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
 
 # Install runtime and dependencies
 
