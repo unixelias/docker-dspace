@@ -33,7 +33,7 @@ ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-$DS
     MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
     TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
 
-ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace57
+ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
@@ -63,9 +63,7 @@ RUN apt-get update \
     vim \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 # Install runtime and dependencies
-
 # Getting and unpacking Tomcat
 RUN mkdir -p "$CATALINA_HOME" \
     && curl -fSL "$TOMCAT_TGZ_URL" -o tomcat.tar.gz \
@@ -86,7 +84,10 @@ RUN mkdir -p maven \
 
 # Build, install and clean
 RUN git clone https://github.com/wtonribeiro/dspace-standard.git -b dspace-5_x --single-branch dspace \
-    && cd dspace && ../maven/bin/mvn -q package \
+    && cd dspace \
+    && sed -i "s#dspace.install.dir=/dspace57#dspace.install.dir=/dspace#" ./build.properties \
+    && sed -i "s#db.url=jdbc:postgresql://localhost:5432/dspace57#db.url=jdbc:postgresql://localhost:5432/dspace#" ./build.properties \
+    && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f "$DSPACE_HOME/webapps" "$CATALINA_HOME" \
@@ -100,11 +101,14 @@ RUN git clone https://github.com/wtonribeiro/dspace-standard.git -b dspace-5_x -
 
 # Install root filesystem
 ADD ./rootfs /
-COPY ./config/local.cfg "$DSPACE_HOME"/config
+COPY ./config/local.cfg /dspace/config
 
-WORKDIR /dspace
+WORKDIR $DSPACE_HOME
 
-VOLUME /dspace/assetstore
+VOLUME $DSPACE_HOME/assetstore
+VOLUME $DSPACE_HOME/config
+VOLUME $DSPACE_HOME/history
+VOLUME $DSPACE_HOME/log
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \

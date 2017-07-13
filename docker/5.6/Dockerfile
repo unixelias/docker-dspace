@@ -102,12 +102,12 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 # Install root filesystem
 ADD ./rootfs /
 
-WORKDIR /dspace
+WORKDIR $DSPACE_HOME
 
-VOLUME /dspace/assetstore
-VOLUME /dspace/config
-VOLUME /dspace/history
-VOLUME /dspace/log
+VOLUME $DSPACE_HOME/assetstore
+VOLUME $DSPACE_HOME/config
+VOLUME $DSPACE_HOME/history
+VOLUME $DSPACE_HOME/log
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
