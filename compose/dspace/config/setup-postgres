@@ -16,7 +16,7 @@ if [ -z $POSTGRES_DB_HOST -a -z $POSTGRES_DB_PORT ]; then
   exit 1
 fi
 
-DSPACE_CFG=/dspace/config/local.cfg
+DSPACE_CFG=$DSPACE_HOME/config/dspace.cfg
 if [ -n $POSTGRES_ADMIN_PASSWORD ]; then
   export PGPASSWORD=$POSTGRES_ADMIN_PASSWORD
 fi
