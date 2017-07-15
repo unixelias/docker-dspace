@@ -53,8 +53,10 @@ RUN set -x \
 	&& apt-get purge -y --auto-remove ca-certificates wget
 
 # make the "pt_BR.UTF-8" locale so postgres will be utf-8 enabled by default
+# Here you can change also the local timezone. We use São Paulo by default (-03)
 RUN apt-get update && apt-get install -y locales && apt-get clean && rm -rf /var/lib/apt/lists/* \
-	&& localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8
+	&& localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8 \
+  && rm /etc/localtime && ln -s /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 
 ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 

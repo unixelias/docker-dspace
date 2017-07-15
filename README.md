@@ -1,4 +1,8 @@
-[![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own commit badge on microbadger.com")  [![Build Status](https://travis-ci.org/unixelias/docker-dspace.svg?branch=latest)](https://travis-ci.org/unixelias/docker-dspace)
+## Docker Status
+[![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own commit badge on microbadger.com")
+
+## Build Status
+[![Build Status](https://travis-ci.org/unixelias/docker-dspace.svg?branch=latest)](https://travis-ci.org/unixelias/docker-dspace)
 
 # What is DSpace?
 
@@ -80,9 +84,8 @@ Note: The security constraint to tunnel request with SSL on the `/rest` endpoint
 
 ## Configure webapps installed
 
-```
-This development work just deploy `jspui` and `rest`.
-```
+
+#### This image removes oai, sword, swordv2 an xmlui by default ***
 
 DSpace consumed a lot of memory, and sometimes we don't really need all the DSpace webapps. So iy's possible to set an environment variables to control the webapps installed :
 
@@ -98,11 +101,9 @@ The command above only installed the webapps `jspui` `xmlui` and `rest`.
 
 This project is configured as an [automated build in Dockerhub](https://hub.docker.com/r/unixelias/docker-dspace/).
 
-Each branch give the related image tag.  
-
 # License
 
 All the code contained in this repository, unless explicitly stated, is
-licensed under ISC license.
+licensed under Apache License Version 2.0.
 
 A copy of the license can be found inside the [LICENSE](LICENSE) file.

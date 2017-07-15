@@ -28,6 +28,8 @@ if [ -n "$DSPACE_WEBAPPS" ]; then
       rm -rf /usr/local/tomcat/webapps/$webapp
     done
 fi
+# Wait for postgres
+
 
 # Start Tomcat
 exec catalina.sh run
