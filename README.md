@@ -2,11 +2,11 @@
 [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own image badge on microbadger.com") [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Get your own commit badge on microbadger.com")
 
 ## Build Status
-[![Build Status](https://travis-ci.org/unixelias/docker-dspace.svg?branch=latest)](https://travis-ci.org/unixelias/docker-dspace)
+[![Build Status](https://travis-ci.org/unixelias/docker-dspace.svg?branch=master)](https://travis-ci.org/unixelias/docker-dspace)
 
 # What is DSpace?
 
-![logo](https://github.com/unixelias/docker-dspace/raw/latest/logo.png)
+![logo](https://github.com/unixelias/docker-dspace/raw/master/logo.png)
 
 [DSpace](https://wiki.duraspace.org/display/DSDOC6x/Introduction) is an open source repository software package typically used for creating open access repositories for scholarly and/or published digital content. While DSpace shares some feature overlap with content management systems and document management systems, the DSpace repository software serves a specific need as a digital archives system, focused on the long-term storage, access and preservation of digital content.
 

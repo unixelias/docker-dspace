@@ -57,7 +57,7 @@ dspace.ui = jspui
 # Name of the site
 ####################################################
 # Changed #
-dspace.name = Repositório Institucional da UFVJM
+dspace.name = Repositório Institucional - R.I. UFVJM
 
 # assetstore.dir, look at DSPACE/config/spring/api/bitstore.xml for more options
 # default is ${dspace.dir}/assetstore, uncomment and modify if you need to use a different path
