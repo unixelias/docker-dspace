@@ -9,6 +9,8 @@ script:
 - ./build.sh
 after_success:
 - ./repo_build.sh
+- docker tag unixelias/docker-dspace:6.0 unixelias/docker-dspace:latest
+- docker push unixelias/docker-dspace:latest
 env:
   global:
   - secure: psE2IviJsXo8tvVO/n2y3oO4Hk7MvXn0x3TucVWEgcBQenT5sw0hoKz5Mb9gAtPa/1NDfiEGyd5r2+wFG6iRTQd/0F1NiqsIe3ck3bLyRgvaX58t7D4wSLP7ktqGA8lj1XBEzMZbj6wFLTzlAZEhM0PeA2tcTYXseRhue/B5TxRTDTdsj9UpTu2NtJyYJ3Xli0QCuiZuB/frnOFuJZeu3QgBeTCNHmrHhx0jKKjcnBHUVxr+s61ZFphwJMpp/rmnmS7xrSERtoyQsHXMbNILSgKLF/ozHVOuYgEJNXRppdiqCKYNs/5EMgBNaxTsHKKKrXvvE6DSkCxG+wp+UioHOucsO14UnL/nVueKYI912DQhNhFMHW6AX4jzKcSaH58gnlt+pS4idEfd+eAZXBr5p316gfyTYryKVFqZWV5wNF69ZoHZcDUAyFuQ6Ev2eUo8iKytemqlyh13tNPtRLb+9Mo9C7Viz2P/VM90tl0zfWYjPJuxBm39kvnHTTguolFTu1vKh5WIzta9mA+MRaKUk/f6BK6J64EVL0myoqhtKktITfe78hT+HB8d5AF5D/6DUlhjcAUD6yampWHtdho8AOLPjzCPNzzIijDqrQ3LyQVXqLiw2HJUnwPOVhuspMotFSzrGhKcNcWkhkN1W0Sv8ZmIMxSazAfr4PR05lJExms=
