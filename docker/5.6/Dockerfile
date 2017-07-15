@@ -6,22 +6,19 @@ FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 
-ARG BUILD_DATE
-ARG VCS_REF
-
-# Build-time metadata as defined at http://label-schema.org
 LABEL Name="Dspace" \
       Version="5.6" \
       Architecture="x86_64" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Dspace" \
-      org.label-schema.description="Deployment of Dspace to the Institutional Repository of UFVJM" \
+      org.label-schema.description="Deployment of Dspace v5.6" \
       org.label-schema.url="http://www.dspace.org/" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="Elias Alves at UFVJM" \
       org.label-schema.version="5.6" \
-      org.label-schema.version="stable" \
+      org.label-schema.version="dev" \
+      org.label-schema.version="source" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
@@ -40,29 +37,28 @@ ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
-# Create Dspace user and adding to the sudoers group
-RUN useradd -ms /bin/bash dspace \
-    && usermod -a -G root dspace
-
 WORKDIR /tmp
 
-# Install pre dependencies and set locales
+# Install pre dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     curl \
-    git \
     locales \
+    tzdata \
     unzip \
     vim \
     xz-utils \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
-    && locale-gen pt_BR.UTF-8
+    && locale-gen pt en es \
+    && unlink /etc/localtime \
+    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
-RUN apt-get update && apt-get upgrade -y\
+RUN apt-get update \
     && apt-get install -y \
     ant \
     default-jdk \
@@ -83,22 +79,25 @@ RUN mkdir -p maven \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz
 
-# Some configs for 6.0 (Ok, works with 5.x versions too)
+#Some configs - chage it if necessary
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
+COPY ./config/local.cfg dspace/config
 
 # Getting and unpacking Dspace
 RUN mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-    && rm -rf dspace.tar.gz
+&& curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
+&& tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+&& rm -rf dspace.tar.gz
 
-# # If you wanto to use the source version put this line on
-# # between the 1st line of next "RUN" command and "cd dspace"
-# git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
+# # If you want to use the code from source you need to comment the lines above
+# # and put this line in the 1st line between the "RUN" and "cd dspace" commands.
+# # Just paste the next line:
+# git clone https://github.com/unixelias/dspace.git -b dspace-5_x dspace &&
 
 # Build, install and clean
-RUN cd dspace && ../maven/bin/mvn -q package \
+RUN cd dspace \
+    && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
@@ -112,14 +111,13 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 
 # Install root filesystem
 ADD ./rootfs /
-COPY ./config/local.cfg /dspace/config
 
-VOLUME /dspace/assetstore
-VOLUME /dspace/config
-VOLUME /dspace/history
-VOLUME /dspace/log
+VOLUME $DSPACE_HOME/assetstore
+VOLUME $DSPACE_HOME/config
+VOLUME $DSPACE_HOME/history
+VOLUME $DSPACE_HOME/log
 
-WORKDIR /dspace
+WORKDIR $DSPACE_HOME
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
