@@ -18,6 +18,7 @@ LABEL Name="Dspace" \
       org.label-schema.vendor="Elias Alves at UFVJM" \
       org.label-schema.version="5.7-ibict" \
       org.label-schema.version="ibict" \
+      org.label-schema.version="dev" \
       org.label-schema.version="source" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace:5.7-ibict"
@@ -43,24 +44,28 @@ WORKDIR /tmp
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
+    curl \
     git \
     locales \
+    tzdata \
     unzip \
+    vim \
     xz-utils \
     && locale-gen pt en es \
+    && unlink /etc/localtime \
+    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update \
     && apt-get install -y \
     ant \
-    curl \
     default-jdk \
     default-jre \
     postgresql-client \
-    vim \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
@@ -101,12 +106,12 @@ RUN git clone https://github.com/wtonribeiro/dspace-standard.git -b dspace-5_x -
 ADD ./rootfs /
 COPY ./config/local.cfg /dspace/config
 
-WORKDIR $DSPACE_HOME
-
 VOLUME $DSPACE_HOME/assetstore
 VOLUME $DSPACE_HOME/config
 VOLUME $DSPACE_HOME/history
 VOLUME $DSPACE_HOME/log
+
+WORKDIR $DSPACE_HOME
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \

@@ -43,23 +43,27 @@ WORKDIR /tmp
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
+    curl \
     locales \
+    tzdata \
     unzip \
+    vim \
     xz-utils \
-    && locale-gen pt_BR.UTF-8 \
+    && locale-gen pt en es \
+    && unlink /etc/localtime \
+    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt' LC_ALL='pt_BR.UTF-8'
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update \
     && apt-get install -y \
     ant \
-    curl \
     default-jdk \
     default-jre \
     postgresql-client \
-    vim \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
@@ -108,12 +112,12 @@ RUN cd dspace \
 # Install root filesystem
 ADD ./rootfs /
 
-WORKDIR $DSPACE_HOME
-
 VOLUME $DSPACE_HOME/assetstore
 VOLUME $DSPACE_HOME/config
 VOLUME $DSPACE_HOME/history
 VOLUME $DSPACE_HOME/log
+
+WORKDIR $DSPACE_HOME
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \

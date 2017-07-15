@@ -21,7 +21,7 @@ LABEL Name="Dspace" \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="Elias Alves at UFVJM" \
       org.label-schema.version="6.0" \
-      org.label-schema.version="latest" \
+      org.label-schema.version="dev" \
       org.label-schema.version="stable" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
@@ -54,12 +54,17 @@ RUN apt-get update \
     curl \
     git \
     locales \
+    tzdata \
     unzip \
     vim \
     xz-utils \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && locale-gen pt en es \
     && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
-    && locale-gen pt_BR.UTF-8
+    && unlink /etc/localtime \
+    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
@@ -115,12 +120,12 @@ RUN cd dspace && ../maven/bin/mvn -q package \
 ADD ./rootfs /
 COPY ./config/local.cfg /dspace/config
 
-VOLUME /dspace/assetstore
-VOLUME /dspace/config
-VOLUME /dspace/history
-VOLUME /dspace/log
+VOLUME $DSPACE_HOME/assetstore
+VOLUME $DSPACE_HOME/config
+VOLUME $DSPACE_HOME/history
+VOLUME $DSPACE_HOME/log
 
-WORKDIR /dspace
+WORKDIR $DSPACE_HOME
 
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
