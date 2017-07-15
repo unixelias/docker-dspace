@@ -1,16 +1,18 @@
 # This Dockerfile is needed just to control the startup order
 # see: https://docs.docker.com/compose/startup-order/
-FROM unixelias/docker-dspace:5.7-ibict
+FROM unixelias/docker-dspace:dev
 
 #Some configs for 6.0
-# COPY ./config/setenv.sh "$CATALINA_HOME"/bin
+COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 # COPY ./config/server.xml "$CATALINA_HOME"/conf
 #
 # COPY ./config/setup-postgres /dspace/bin
 # COPY ./config/start-dspace /dspace/bin
-RUN chmod ug+x "$CATALINA_HOME"/bin/setenv.sh \
-    && chmod ug+x /dspace/bin/start-dspace \
-    && chmod ug+x /dspace/bin/setup-postgres
+# COPY ./config/local.cfg.UTF-8 /dspace/config
+#
+# RUN rm /dspace/config/local.cfg \
+#     && iconv -f UTF-8 -t ISO-8859-1 /dspace/config/local.cfg.UTF-8 > /dspace/config/local.cfg \
+#     && cat /dspace/config/local.cfg
     # && locale-gen pt en es \
     #&& unlink /etc/localtime \
     #&& ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime
