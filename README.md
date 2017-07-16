@@ -1,11 +1,11 @@
-## Docker Status
+## Docker Status by tag
 [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Docker tag version") [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Content layers") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Last commit")
 
 [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace:5.6.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.6 "Docker tag version") [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace:5.6.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.6 "Content layers") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace:5.6.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.6 "Last commit")
 
-[![](https://images.microbadger.com/badges/version/unixelias/docker-dspace:5.7-ibict.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.7-ibict "Docker tag version") [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace:5.7-ibict.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.7-ibict "Content layers") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace:5.7-ibict.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.7-ibict "Last commit")
-
 [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace:dev.svg)](https://microbadger.com/images/unixelias/docker-dspace:dev "Docker tag version") [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace:5.x-dev.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.x-dev "Content layers") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace:5.x-dev.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.x-dev "Last commit")
+
+[![](https://images.microbadger.com/badges/version/unixelias/docker-dspace:5.7-ibict.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.7-ibict "Docker tag version") [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace:5.7-ibict.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.7-ibict "Content layers") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace:5.7-ibict.svg)](https://microbadger.com/images/unixelias/docker-dspace:5.7-ibict "Last commit")
 
 ## Build Status
 [![Build Status](https://travis-ci.org/unixelias/docker-dspace.svg?branch=master)](https://travis-ci.org/unixelias/docker-dspace)
