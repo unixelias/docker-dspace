@@ -6,6 +6,9 @@ FROM ubuntu
 
 MAINTAINER Elias Alves <elias.alves@ufvjm.edu.br>
 
+ARG BUILD_DATE
+ARG VCS_REF
+
 LABEL Name="Dspace" \
       Version="5.6" \
       Architecture="x86_64" \
