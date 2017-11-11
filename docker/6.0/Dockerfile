@@ -29,9 +29,9 @@ LABEL Name="Dspace" \
 # Environment variables
 ENV DSPACE_VERSION=6.0 \
     TOMCAT_MAJOR=8 \
-    TOMCAT_VERSION=8.5.16 \
+    TOMCAT_VERSION=8.5.23 \
     MAVEN_MAJOR=3 \
-    MAVEN_VERSION=3.5.0
+    MAVEN_VERSION=3.5.2
 
 ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-$DSPACE_VERSION/dspace-$DSPACE_VERSION-release.tar.gz \
     MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
