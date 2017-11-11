@@ -8,12 +8,12 @@ services:
       - db_data:/var/lib/postgresql/data
 
   dspace:
-    image: unixelias/docker-dspace:dev
+    image: unixelias/docker-dspace:latest
     # If you wanto to change the configuration you can build again
     # and add custom config files
     #build: ./dspace
     ports:
-      - 8080:8080
+      - 80:8080
     depends_on:
       - postgres
     environment:
