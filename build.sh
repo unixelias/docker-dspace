@@ -6,10 +6,6 @@ last=""
 for i in $( ls docker); do
   case "$i" in
       *-test|dev )  ;;
-      postgres ) docker build -t unixelias/postgres-dspace:9.6-ptbr \
-          --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-          --build-arg VCS_REF=`git rev-parse --short HEAD` docker/postgres \
-          && docker push unixelias/postgres-dspace:9.6-ptbr ;;
       * ) docker build -t unixelias/docker-dspace:$i \
           --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
           --build-arg VCS_REF=`git rev-parse --short HEAD` docker/$i \

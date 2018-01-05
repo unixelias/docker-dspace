@@ -27,9 +27,9 @@ LABEL Name="Dspace" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
 # Environment variables
-ENV DSPACE_VERSION=6.0 \
+ENV DSPACE_VERSION=6.2 \
     TOMCAT_MAJOR=8 \
-    TOMCAT_VERSION=8.5.23 \
+    TOMCAT_VERSION=8.5.24 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.2
 

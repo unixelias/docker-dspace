@@ -15,15 +15,14 @@ LABEL Name="Dspace" \
       Architecture="x86_64" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.name="Dspace" \
-      org.label-schema.description="Deployment of Dspace for the Institutional Repository of UFVJM" \
+      org.label-schema.description="Deployment of Dspace v6.0" \
       org.label-schema.url="http://www.dspace.org/" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/unixelias/docker-dspace" \
       org.label-schema.vendor="Elias Alves at UFVJM" \
       org.label-schema.version="6.0" \
-      org.label-schema.version="dev" \
-      org.label-schema.version="test" \
-      org.label-schema.version="source" \
+      org.label-schema.version="EN" \
+      org.label-schema.version="stable" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.docker.cmd="docker run -d --link dspace_db:postgres -p 8080:8080 unixelias/docker-dspace"
 
@@ -49,24 +48,26 @@ RUN useradd -ms /bin/bash dspace \
 WORKDIR /tmp
 
 # Install pre dependencies and set locales
+# To set locales you may you need to change some lines here (uncomment/change)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     curl \
     git \
-    locales \
-    tzdata \
+#    locales \
+#    tzdata \
     unzip \
     vim \
     xz-utils \
-    && locale-gen pt en es \
-    && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
-    && unlink /etc/localtime \
-    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
-    && dpkg-reconfigure -f noninteractive tzdata \
+#    && locale-gen pt en es \
+#    && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
+#    && unlink /etc/localtime \
+#    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
+#    && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
+# You can change the default S.O. language here
+# ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update && apt-get upgrade -y\
@@ -94,19 +95,18 @@ RUN mkdir -p maven \
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
 
-# # Getting and unpacking Dspace
-# RUN mkdir -p dspace \
-#     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-#     && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-#     && rm -rf dspace.tar.gz
+# Getting and unpacking Dspace
+RUN mkdir -p dspace \
+    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
+    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
+    && rm -rf dspace.tar.gz
 
 # # If you wanto to use the source version put this line on
 # # between the 1st line of next "RUN" command and "cd dspace"
 # git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
 
 # Build, install and clean
-RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
-    && cd dspace && ../maven/bin/mvn -q package \
+RUN cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
@@ -120,10 +120,7 @@ RUN git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace \
 
 # Install root filesystem
 ADD ./rootfs /
-COPY ./config/local.cfg /dspace/config/local.cfg.UTF-8
-
-# Change the enconding of local.cfg to work with pt_BR
-RUN iconv -f UTF-8 -t ISO-8859-1 /dspace/config/local.cfg.UTF-8 > /dspace/config/local.cfg
+COPY ./config/local.cfg /dspace/config
 
 VOLUME $DSPACE_HOME/assetstore
 VOLUME $DSPACE_HOME/config
