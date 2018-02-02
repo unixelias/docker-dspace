@@ -33,7 +33,7 @@ We have a custom [PostgreSQL Docker Image](https://hub.docker.com/r/unixelias/po
 First, we have to create the PostgreSQL container:
 
 ```
-docker run -d --name dspace_db -p 5432:5432 unixelias/postgres-dspace
+docker run -d --name dspace_db -p 5432:5432 postgres
 ```
 
 then run DSpace linking the PostgreSQL container:
