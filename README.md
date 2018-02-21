@@ -1,3 +1,6 @@
+## Give me a beer :beer: :wink:
+[![](donate.en.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=QP47NPXKSA2ZJ&lc=BR&item_name=Velvettux%20Systems&item_number=docker%2ddspace&no_note=0&cn=Adicionar%20instru%c3%a7%c3%b5es%20especiais%20para%20o%20vendedor%3a&no_shipping=2&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted "Donate")
+
 ## Docker Status by tag
 [![](https://images.microbadger.com/badges/version/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Docker tag version") [![](https://images.microbadger.com/badges/image/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Content layers") [![](https://images.microbadger.com/badges/commit/unixelias/docker-dspace.svg)](https://microbadger.com/images/unixelias/docker-dspace "Last commit")
 
