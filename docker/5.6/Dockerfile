@@ -28,7 +28,7 @@ LABEL Name="Dspace" \
 # Environment variables
 ENV DSPACE_VERSION=5.6 \
     TOMCAT_MAJOR=8 \
-    TOMCAT_VERSION=8.5.27 \
+    TOMCAT_VERSION=8.5.28 \
     MAVEN_MAJOR=3 \
     MAVEN_VERSION=3.5.2
 
