@@ -1,14 +1,14 @@
 version: "3"
 services:
   postgres:
-    image: postgres
+    build: ./db
     hostname: postgres
     restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
 
   dspace:
-    image: unixelias/docker-dspace:latest
+    image: unixelias/docker-dspace:6.2-ptbr
     # If you wanto to change the configuration you can build again
     # and add custom config files
     #build: ./dspace
