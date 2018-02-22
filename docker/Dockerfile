@@ -47,34 +47,17 @@ RUN useradd -ms /bin/bash dspace \
 
 WORKDIR /tmp
 
-# Install pre dependencies and set locales
-# To set locales you may you need to change some lines here (uncomment/change)
+# Install pre dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     bzip2 \
     curl \
-    git \
-#    locales \
-#    tzdata \
-    unzip \
-    vim \
-    xz-utils \
-#    && locale-gen pt en es \
-#    && echo "pt_BR pt_BR.UTF-8" >> /etc/locale.alias \
-#    && unlink /etc/localtime \
-#    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
-#    && dpkg-reconfigure -f noninteractive tzdata \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# You can change the default S.O. language here
-# ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
-
-# Install build dependencies and Java OpenJDK ubuntu latest
-RUN apt-get update && apt-get upgrade -y\
-    && apt-get install -y --no-install-recommends \
     default-jdk \
     default-jre \
+    git \
     postgresql-client \
+    unzip \
+    xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
@@ -84,15 +67,15 @@ RUN mkdir -p "$CATALINA_HOME" \
     && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
     && rm -rf tomcat.tar.gz
 
-# Some configs for 6.0
+# Some configs for 6.x
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
 
 # Getting and unpacking Maven
 # Getting and unpacking Dspace
 # # If you wanto to use the source version put this line
-# # between the 1st line of next "RUN" command and "cd dspace"
-# git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
+# # instead of the "Get Dspace" section
+#   git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
 # Build, install and clean
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
@@ -131,7 +114,7 @@ WORKDIR $DSPACE_HOME
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
     echo "- with `java -version 2>&1 | awk 'NR == 2'`" >> /root/.built && \
-    echo "- with DSpace $DSPACE_VERSION on Tomcat $TOMCAT_VERSION"  >> /root/.built
+    echo "- with DSpace v$DSPACE_VERSION on Tomcat v$TOMCAT_VERSION"  >> /root/.built
 
 EXPOSE 8080
 
