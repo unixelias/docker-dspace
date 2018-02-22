@@ -71,8 +71,7 @@ RUN apt-get update \
 
 # Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update && apt-get upgrade -y\
-    && apt-get install -y \
-    ant \
+    && apt-get install -y --no-install-recommends \
     default-jdk \
     default-jre \
     postgresql-client \
@@ -106,7 +105,9 @@ RUN mkdir -p dspace \
 # git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
 
 # Build, install and clean
-RUN cd dspace && ../maven/bin/mvn -q package \
+RUN apt-get update && apt-get upgrade -y\
+    && apt-get install -y --no-install-recommends ant \
+    && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
