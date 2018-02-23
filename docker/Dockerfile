@@ -50,14 +50,14 @@ WORKDIR /tmp
 # Install pre dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    bzip2 \
-    curl \
-    default-jdk \
-    default-jre \
-    git \
-    postgresql-client \
-    unzip \
-    xz-utils \
+        bzip2 \
+        curl \
+        default-jdk \
+        default-jre \
+        git \
+        postgresql-client \
+        unzip \
+        xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
@@ -73,9 +73,6 @@ COPY ./config/server.xml "$CATALINA_HOME"/conf
 
 # Getting and unpacking Maven
 # Getting and unpacking Dspace
-# # If you wanto to use the source version put this line
-# # instead of the "Get Dspace" section
-#   git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
 # Build, install and clean
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
@@ -85,18 +82,13 @@ RUN mkdir -p maven \
     && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
     && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
     && rm -rf dspace.tar.gz \
-    && apt-get update && apt-get upgrade -y\
-    && apt-get install -y --no-install-recommends ant \
     && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
+    && apt-get update && apt-get install -y --no-install-recommends ant \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
-    && rm -rf /usr/local/tomcat/webapps/oai \
-    && rm -rf /usr/local/tomcat/webapps/sword \
-    && rm -rf /usr/local/tomcat/webapps/swordv2 \
-    && rm -rf /usr/local/tomcat/webapps/xmlui \
     && rm -rf ../maven \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
