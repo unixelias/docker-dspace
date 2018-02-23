@@ -66,7 +66,7 @@ RUN apt-get update && apt-get install -y locales tzdata \
     && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR.UTF' LC_ALL='pt_BR.UTF-8'
 
 # Install build dependencies and Java OpenJDK ubuntu latest
 RUN apt-get update && apt-get upgrade -y\
