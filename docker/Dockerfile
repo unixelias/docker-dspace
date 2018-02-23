@@ -106,6 +106,7 @@ RUN mkdir -p maven \
     && sed -i "s#db.url=jdbc:postgresql://localhost:5432/dspace57#db.url=jdbc:postgresql://localhost:5432/dspace#" ./build.properties \
     && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
+    && apt-get update && apt-get install -y --no-install-recommends ant \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f "$DSPACE_HOME/webapps" "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
