@@ -10,7 +10,8 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VCS_BRANCH
 # Environment variables
-ARG DSPACE_VERSION
+ARG SOURCE_REPO
+ARG SOURCE_BRANCH
 ARG TOMCAT_MAJOR
 ARG TOMCAT_VERSION
 ARG MAVEN_MAJOR
@@ -33,31 +34,52 @@ LABEL Name="Dspace v${DSPACE_VERSION}" \
       org.label-schema.docker.cmd="docker run -d --link postgres -p 8080:8080 unixelias/docker-dspace"
 
 
-ENV DPSACE_TGZ_URL=https://github.com/DSpace/DSpace/releases/download/dspace-$DSPACE_VERSION/dspace-$DSPACE_VERSION-release.tar.gz \
-    MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+ENV MAVEN_TGZ_URL=http://apache.mirror.iweb.ca/maven/maven-$MAVEN_MAJOR/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
     TOMCAT_TGZ_URL=https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
 
 ENV CATALINA_HOME=/usr/local/tomcat DSPACE_HOME=/dspace
 
 ENV PATH=$CATALINA_HOME/bin:$DSPACE_HOME/bin:$PATH
 
-# Create Dspace user and adding to the sudoers group
-RUN useradd -ms /bin/bash dspace \
-    && usermod -a -G root dspace
-
 WORKDIR /tmp
 
-# Install pre dependencies and Java OpenJDK ubuntu latest
-RUN apt-get update \
+# Install pre dependencies and set locales
+# To set locales you may you need to change some lines here (uncomment/change)
+# Set languages and locales
+RUN apt-get update && apt-get install -y locales tzdata \
+    && touch /usr/share/locale/locale.alias \
+    && localedef -i pt_BR -c -f UTF-8 -A /usr/share/locale/locale.alias pt_BR.UTF-8 \
+    && echo "LC_ALL=pt_BR.UTF-8" >> /etc/environment \
+    && echo "pt_BR.UTF-8 UTF-8" >> /etc/locale.gen \
+    && echo "LANG=pt_BR.UTF-8" > /etc/locale.conf \
+    && echo "LC_ALL=en_US.UTF-8" >> /etc/environment \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && echo "LANG=en_US.UTF-8" > /etc/locale.conf \
+    && echo "portuguese	pt_BR" >> /etc/locale.alias \
+    && echo "portuguese	pt_BR.UTF-8" >> /etc/locale.alias \
+    && echo "english	en_US" >> /etc/locale.alias \
+    && echo "english	en_US.UTF-8" >> /etc/locale.alias \
+    && locale-gen pt_BR pt_BR.UTF-8 en_US en_US.UTF-8 \
+    && dpkg-reconfigure -f noninteractive locales \
+    && unlink /etc/localtime \
+    && ln -s /usr/share/zoneinfo/Brazil/East /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV LANG='pt_BR.UTF-8' LANGUAGE='pt_BR:pt:en' LC_ALL='pt_BR.UTF-8'
+
+# Install build dependencies and Java OpenJDK ubuntu latest
+RUN apt-get update && apt-get upgrade -y\
     && apt-get install -y --no-install-recommends \
-    bzip2 \
-    curl \
-    default-jdk \
-    default-jre \
-    git \
-    postgresql-client \
-    unzip \
-    xz-utils \
+        bzip2 \
+        curl \
+        default-jdk \
+        default-jre \
+        git \
+        postgresql-client \
+        unzip \
+        vim \
+        xz-utils \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install runtime and dependencies
@@ -67,30 +89,25 @@ RUN mkdir -p "$CATALINA_HOME" \
     && tar -xf tomcat.tar.gz --strip-components=1 -C "$CATALINA_HOME" \
     && rm -rf tomcat.tar.gz
 
-# Some configs for 6.x
+# Some configs 
 COPY ./config/setenv.sh "$CATALINA_HOME"/bin
 COPY ./config/server.xml "$CATALINA_HOME"/conf
 
 # Getting and unpacking Maven
-# Getting and unpacking Dspace
-# # If you wanto to use the source version put this line
-# # instead of the "Get Dspace" section
-#   git clone https://github.com/unixelias/dspace.git -b dspace-6_x dspace &&
 # Build, install and clean
+# Change install dir to default name: "dspace"
 RUN mkdir -p maven \
     && curl -fSL "$MAVEN_TGZ_URL" -o maven.tar.gz \
     && tar -xf maven.tar.gz --strip-components=1  -C maven \
     && rm -rf maven.tar.gz \
-    && mkdir -p dspace \
-    && curl -L "$DPSACE_TGZ_URL" -o dspace.tar.gz \
-    && tar -xf dspace.tar.gz --strip-components=1  -C dspace \
-    && rm -rf dspace.tar.gz \
-    && apt-get update && apt-get upgrade -y\
-    && apt-get install -y --no-install-recommends ant \
-    && cd dspace && ../maven/bin/mvn -q package \
+    && git clone ${SOURCE_REPO} -b ${SOURCE_BRANCH} --single-branch dspace \
+    && cd dspace \
+    && sed -i "s#dspace.install.dir=/dspace57#dspace.install.dir=/dspace#" ./build.properties \
+    && sed -i "s#db.url=jdbc:postgresql://localhost:5432/dspace57#db.url=jdbc:postgresql://localhost:5432/dspace#" ./build.properties \
+    && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
-    && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
+    && rm -fr "$CATALINA_HOME/webapps" && mv -f "$DSPACE_HOME/webapps" "$CATALINA_HOME" \
     && sed -i s/CONFIDENTIAL/NONE/ /usr/local/tomcat/webapps/rest/WEB-INF/web.xml \
     && rm -fr ~/.m2 && rm -fr /tmp/* && apt-get remove -y ant \
     && rm -rf /usr/local/tomcat/webapps/oai \
@@ -114,7 +131,7 @@ WORKDIR $DSPACE_HOME
 # Build info
 RUN echo "Ubuntu GNU/Linux 16.04 (xenial) image. (`uname -rsv`)" >> /root/.built && \
     echo "- with `java -version 2>&1 | awk 'NR == 2'`" >> /root/.built && \
-    echo "- with DSpace v$DSPACE_VERSION on Tomcat v$TOMCAT_VERSION"  >> /root/.built
+    echo "- with DSpace v${VCS_BRANCH} on Tomcat v$TOMCAT_VERSION"  >> /root/.built
 
 EXPOSE 8080
 
