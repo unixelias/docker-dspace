@@ -92,6 +92,11 @@ RUN mkdir -p maven \
     && rm -rf ../maven \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Activating Sword
+
+RUN cp -Rv /usr/local/tomcat/webapps/sword sword
+COPY ./config/sword-server.cfg /dspace/config/modules/sword-server.cfg
+
 # Install root filesystem
 ADD ./rootfs /
 COPY ./config/local.cfg /dspace/config
