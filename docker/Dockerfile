@@ -87,7 +87,7 @@ RUN mkdir -p maven \
     && rm -rf dspace.tar.gz \
     && apt-get update && apt-get upgrade -y\
     && apt-get install -y --no-install-recommends ant \
-    && cd dspace && ../maven/bin/mvn -X package \
+    && cd dspace && ../maven/bin/mvn -q package \
     && cd dspace/target/dspace-installer \
     && ant init_installation init_configs install_code copy_webapps \
     && rm -fr "$CATALINA_HOME/webapps" && mv -f /dspace/webapps "$CATALINA_HOME" \
